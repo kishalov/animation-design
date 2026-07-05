@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animation Studio&nbsp;— Motion that stops the scroll</title>
+
+<style>
+@font-face {
+  font-family: 'Nozhik';
+  src: url('fonts/Nozhik.woff') format('woff'); /* проверь расширение файла woff или woff2 */
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'NewCMMono';
+  src: url('fonts/NewCMMono.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+  :root{
+    --canvas:#171512;
+    --canvas-light:#232019;
+    --paper:#f3ecdd;
+    --paper-dim:#e6ddc7;
+    --ink:#1c1812;
+    --orange:#ff5a2a;
+    --cobalt:#2e4fe0;
+    --yellow:#f2c230;
+    --grain-opacity:0.06;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--canvas);
+  color:var(--paper);
+font-family:'NewCMMono', monospace;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+  img,svg{display:block; max-width:100%;}
+
+  h1,h2,h3{font-family:'Nozhik', sans-serif; font-weight:400; margin:0; text-transform:uppercase; letter-spacing:0.5px;}
+  .eyebrow{
+font-family:'NewCMMono', monospace;
+    font-size:0.78rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    display:inline-block;
+    padding:.35rem .8rem;
+    background:var(--paper);
+    color:var(--ink);
+    transform:rotate(-2deg);
+    box-shadow:2px 3px 0 rgba(0,0,0,.35);
+  }
+
+  /* film grain overlay&nbsp;— built from two offset dot grids, not turbulence.
+     Turbulence noise has an inherent directional bias that showed up as
+     faint diagonal banding across the page; dots have no such bias. */
+  .grain{
+    position:fixed; inset:0; z-index:999; pointer-events:none;
+    opacity:0.5; mix-blend-mode:overlay;
+    background-image:
+      radial-gradient(rgba(255,255,255,.5) 1px, transparent 1px),
+      radial-gradient(rgba(0,0,0,.4) 1px, transparent 1px);
+    background-size:3px 3px, 5px 5px;
+    background-position:0 0, 2px 1px;
+  }
+
+  a{color:inherit;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 6vw;}
+
+  /* ---------------- NAV ---------------- */
+  header{
+    position:sticky; top:0; z-index:500;
+    background:var(--canvas);
+    border-bottom:3px solid var(--paper);
+  }
+  .nav-strip{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0.9rem 6vw;
+  }
+.logo{
+  font-family:'Nozhik', sans-serif;
+  font-size:2rem;
+  display:flex; align-items:center; gap:.6rem;
+}
+  .logo-mark{
+    width:38px; height:38px;
+    background:var(--orange);
+    color:var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Nozhik', sans-serif;
+    font-size: 2rem;
+    transform:rotate(90deg);
+  }
+  nav.links{display:flex; gap:2rem; font-size:.95rem;}
+  nav.links a{
+    text-decoration:none; position:relative; padding-bottom:3px;
+  }
+  nav.links a::after{
+    content:""; position:absolute; left:0; bottom:0; height:3px; width:0;
+    background:var(--yellow); transition:width .25s ease;
+  }
+  nav.links a:hover::after{width:100%;}
+  .btn{
+    font-weight:700;
+    font-size:.9rem;
+    background:var(--orange);
+    color:var(--ink);
+    border:2px solid var(--ink);
+    padding:.65rem 1.3rem;
+    text-decoration:none;
+    display:inline-block;
+    box-shadow:4px 4px 0 var(--paper);
+    transition:transform .15s ease, box-shadow .15s ease;
+    cursor:pointer;
+  }
+  .btn:hover{transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--paper);}
+  .btn:active{transform:translate(1px,1px); box-shadow:2px 2px 0 var(--paper);}
+  .btn.ghost{background:transparent; color:var(--paper); border-color:var(--paper); box-shadow:4px 4px 0 var(--orange);}
+
+  .burger{display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer;}
+  .burger span{width:26px; height:3px; background:var(--paper);}
+
+  .lang-switch{
+    display:flex; align-items:center; gap:0;
+    background:var(--paper); border:2px solid var(--ink);
+    padding:2px; cursor:pointer; transform:rotate(-2deg);
+    box-shadow:3px 3px 0 var(--orange);
+font-family:'NewCMMono', monospace;
+  }
+  .lang-option{
+    padding:.3rem .55rem; font-size:.75rem; color:var(--ink);
+    transition:background .2s ease, color .2s ease;
+  }
+  .lang-option.active{background:var(--ink); color:var(--paper);}
+
+  /* ---------------- HERO ---------------- */
+ .hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.hero::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:220px; /* регулируй по вкусу */
+  background:linear-gradient(
+    to bottom,
+    rgba(23,21,18,0) 0%,
+    rgba(23,21,18,.15) 20%,
+    rgba(23,21,18,.45) 45%,
+    rgba(23,21,18,.8) 70%,
+    var(--canvas) 100%
+  );
+  pointer-events: none;
+  z-index:-1;
+}
+.hero-video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:-3;
+  opacity: 30%;
+  pointer-events: none;
+}
+
+.hero-overlay{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(rgba(23,21,18,.45), rgba(23,21,18,.7)),
+    radial-gradient(circle at 20% 30%, rgba(255,90,42,.15), transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(46,79,224,.12), transparent 40%);
+  z-index:-2;
+  pointer-events: none;
+}
+  .hero-inner{max-width:1180px; margin:0 auto; position:relative;} 
+  .hero .eyebrow{margin-bottom:1.6rem;}
+
+  .cut-title{
+    font-size:clamp(2.6rem, 8vw, 6.4rem);
+    line-height:0.98;
+    display:flex; flex-wrap:wrap; gap:.5rem .6rem;
+  }
+  .cut-title .row{display:flex; flex-wrap:wrap; gap:.5rem .6rem; width:100%;}
+  .cut-title .row > span{
+    display:inline-block;
+    padding:.05em .18em;
+    transform:rotate(var(--r,-3deg));
+    box-shadow:3px 4px 0 rgba(0,0,0,.4);
+  }
+  .cut-title .paper-tile{background:var(--paper); color:var(--ink);}
+  .cut-title .orange-tile{background:var(--orange); color:var(--ink);}
+  .cut-title .yellow-tile{background:var(--yellow); color:var(--ink);}
+  .cut-title .cobalt-tile{background:var(--cobalt); color:var(--paper);}
+  .cut-title .row > span:nth-child(odd){--r:-3deg;}
+  .cut-title .row > span:nth-child(even){--r:2.5deg;}
+  .cut-title .row > span:nth-child(3n){--r:-1.5deg;}
+
+  .hero-sub{
+    max-width:520px;
+    margin:2rem 0 2.4rem;
+    font-size:1.1rem;
+    line-height:1.55;
+    color:var(--paper-dim);
+  }
+  .hero-cta{display:flex; gap:1rem; flex-wrap:wrap;}
+
+  .scrap-field{position:absolute; inset:0; z-index:100; pointer-events:none;}
+  .scrap{
+    position:absolute;
+    border:2px solid var(--ink);
+    box-shadow:5px 6px 0 rgba(0,0,0,.45);
+    cursor:grab;
+    touch-action:none;
+    user-select:none;
+    transition:box-shadow .2s ease;
+    pointer-events: auto;
+  }
+  .scrap:active{cursor:grabbing; box-shadow:2px 3px 0 rgba(0,0,0,.45);}
+  .scrap.tape::before{
+    content:""; position:absolute; top:-14px; left:50%; transform:translateX(-50%) rotate(-3deg);
+    width:70px; height:26px; background:rgba(243,236,221,.75);
+    border:1px solid rgba(0,0,0,.15);
+  }
+  .scrap-a{width:150px; top:6%; right:8%; background:var(--yellow); transform:rotate(8deg); padding:14px;}
+  .scrap-b{width:130px; top:52%; right:20%; background:var(--cobalt); transform:rotate(-7deg); padding:14px;}
+  .scrap-c{width:120px; top:20%; right:26%; background:var(--paper); transform:rotate(4deg); padding:12px; display:none;}
+  .scrap svg{width:100%; height:auto;}
+  .scrap-label{font-family:'Special Elite',monospace; font-size:.65rem; color:var(--ink); margin-top:6px; text-align:center;}
+
+  .scroll-cue{
+    margin-top:4rem; font-family:'NewCMMono', monospace;; font-size:.8rem;
+    color:var(--paper-dim); display:flex; align-items:center; gap:.6rem;
+  }
+  .scroll-cue .arrow{animation:bob 1.6s infinite ease-in-out;}
+  @keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(6px);}}
+
+  /* ---------------- SECTION GENERIC ---------------- */
+  section{padding:6.5rem 0; position:relative;}
+  .section-head{max-width:640px; margin-bottom:3.4rem;}
+  .section-head h2{font-size:clamp(2rem,4.2vw,3.2rem); margin-top:1rem; line-height:1.02;}
+  .section-head p{color:var(--paper-dim); margin-top:1rem; font-size:1.05rem; line-height:1.5;}
+
+  .reveal{opacity:0; transform:translateY(28px) rotate(-1deg); transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in-view{opacity:1; transform:translateY(0) rotate(0deg);}
+
+  /* ---------------- SERVICES ---------------- */
+  .services-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1.6rem;
+  }
+  .service-card{
+    background:var(--paper); color:var(--ink);
+    padding:1.6rem 1.3rem 1.8rem;
+    border:2px solid var(--ink);
+    box-shadow:6px 7px 0 rgba(0,0,0,.4);
+    position:relative;
+  }
+  .service-card:nth-child(1){transform:rotate(-2.5deg);}
+  .service-card:nth-child(2){transform:rotate(1.5deg);}
+  .service-card:nth-child(3){transform:rotate(-1deg);}
+  .service-card:nth-child(4){transform:rotate(2.2deg);}
+  .service-card:hover{transform:rotate(0deg) translateY(-4px); box-shadow:8px 10px 0 rgba(0,0,0,.4); z-index:5;}
+  .service-card{transition:transform .25s ease, box-shadow .25s ease;}
+  .service-num{
+    font-family:'NewCMMono', monospace;; font-size:.75rem;
+    background:var(--ink); color:var(--paper); padding:.2rem .5rem; display:inline-block; margin-bottom:.8rem;
+  }
+  .service-card h3{font-size:1.25rem; margin-bottom:.6rem; line-height:1.05;}
+  .service-card p{font-size:.92rem; line-height:1.4; color:#3a342a;}
+  .service-icon{width:44px; height:44px; margin-bottom:.9rem;}
+
+  /* ---------------- PROCESS FILMSTRIP ---------------- */
+  .filmstrip{
+    background:var(--canvas-light);
+    border-top:4px dashed var(--paper-dim);
+    border-bottom:4px dashed var(--paper-dim);
+    padding:2.6rem 0;
+    position:relative;
+  }
+  .sprockets{
+    position:absolute; left:0; right:0; height:22px;
+    display:flex; justify-content:space-around; align-items:center;
+  }
+  .sprockets.top{top:-13px;} .sprockets.bottom{bottom:-13px;}
+  .sprockets span{width:14px; height:14px; background:var(--canvas); border:2px solid var(--paper-dim); border-radius:2px;}
+  .process-row{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1.4rem;
+  }
+  .frame{
+    background:var(--paper); color:var(--ink);
+    padding:1.4rem;
+    border:2px solid var(--ink);
+    position:relative;
+  }
+.frame .fnum{
+  font-family:'Nozhik', sans-serif; font-size:2.4rem; color:var(--orange);
+  -webkit-text-stroke:1.5px var(--ink);
+}
+  .frame h3{font-size:1.05rem; margin:.5rem 0 .5rem;}
+  .frame p{font-size:.88rem; color:#3a342a; line-height:1.4;}
+
+  /* ---------------- PORTFOLIO ---------------- */
+  .portfolio-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem;
+  }
+  .clip{
+    position:relative; overflow:hidden;
+    border:2px solid var(--paper);
+    aspect-ratio:4/3;
+    cursor:pointer;
+  }
+  .clip .clip-bg{
+    position:absolute; inset:0;
+    background-size:cover; background-position:center;
+    transition:transform .5s ease;
+  }
+  .clip:hover .clip-bg{transform:scale(1.08);}
+  .clip .halftone{
+    position:absolute; inset:0;
+    background-image:radial-gradient(rgba(0,0,0,.5) 1px, transparent 1.3px);
+    background-size:6px 6px;
+    mix-blend-mode:multiply;
+    opacity:.5;
+  }
+  .clip .tag{
+    position:absolute; left:10px; bottom:10px;
+    background:var(--paper); color:var(--ink);
+    font-family:'NewCMMono', monospace;; font-size:.72rem;
+    padding:.35rem .6rem;
+    transform:rotate(-2deg);
+    box-shadow:2px 3px 0 rgba(0,0,0,.4);
+  }
+  .clip .play{
+    position:absolute; top:10px; right:10px; width:34px; height:34px;
+    background:var(--orange); border:2px solid var(--ink); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  /* ---------------- TESTIMONIALS ---------------- */
+  .testi-board{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:2rem;
+  }
+  .testi{
+    background:var(--paper); color:var(--ink);
+    padding:1.8rem 1.5rem;
+    position:relative;
+    box-shadow:5px 6px 0 rgba(0,0,0,.35);
+    font-family:'NewCMMono', monospace;;
+    font-size:.95rem;
+    line-height:1.5;
+  }
+  .testi:nth-child(1){transform:rotate(-2deg);}
+  .testi:nth-child(2){transform:rotate(1.5deg);}
+  .testi:nth-child(3){transform:rotate(-1deg);}
+  .testi::before{
+    content:""; position:absolute; top:-11px; left:50%; transform:translateX(-50%);
+    width:18px; height:18px; border-radius:50%;
+    background:var(--orange); border:2px solid var(--ink);
+  }
+  .testi .who{margin-top:1.2rem; font-family:'NewCMMono', monospace;; font-size:.85rem; color:#3a342a;}
+
+  /* ---------------- CTA STAMP ---------------- */
+  .cta-stamp{
+    background:var(--orange); color:var(--ink);
+    text-align:center; padding:6rem 6vw;
+    border-top:6px solid var(--ink); border-bottom:6px solid var(--ink);
+  }
+  .cta-stamp h2{
+    font-size:clamp(2.2rem,6vw,4.6rem);
+    line-height:1;
+    transform:rotate(-2deg);
+    display:inline-block;
+    border:5px solid var(--ink);
+    padding:.3em .5em;
+  }
+  .cta-stamp p{margin:1.6rem 0 2rem; font-size:1.05rem;}
+  .cta-stamp .btn{background:var(--ink); color:var(--paper); box-shadow:5px 5px 0 rgba(0,0,0,.35);}
+  .cta-stamp .btn:hover{box-shadow:7px 7px 0 rgba(0,0,0,.35);}
+
+  /* ---------------- FOOTER ---------------- */
+  footer{
+    padding:3.2rem 6vw 2.4rem;
+    background:repeating-linear-gradient(-45deg, var(--canvas-light), var(--canvas-light) 12px, var(--canvas) 12px, var(--canvas) 24px);
+    border-top:3px solid var(--paper);
+  }
+  .foot-grid{display:flex; justify-content:space-between; flex-wrap:wrap; gap:2rem;}
+  .foot-col h4{font-family:'Special Elite',monospace; font-size:.8rem; letter-spacing:.08em; color:var(--yellow); margin-bottom:.8rem;}
+  .foot-col a{display:block; text-decoration:none; font-size:.92rem; margin-bottom:.5rem; color:var(--paper-dim);}
+  .foot-col a:hover{color:var(--paper);}
+  .foot-bottom{margin-top:2.5rem; font-size:.78rem; color:#8b8474; display:flex; justify-content:space-between; flex-wrap:wrap; gap:.6rem;}
+
+  /* ---------------- RESPONSIVE ---------------- */
+  @media (max-width:900px){
+    nav.links, .hero-cta .btn.ghost{display:none;}
+    .burger{display:flex;}
+    .services-grid, .process-row{grid-template-columns:repeat(2,1fr);}
+    .portfolio-grid, .testi-board{grid-template-columns:repeat(2,1fr);}
+    .scrap-b{right:6%;}
+  }
+  @media (max-width:600px){
+    .services-grid, .process-row, .portfolio-grid, .testi-board{grid-template-columns:1fr;}
+    .hero{padding:7rem 6vw 5rem;}
+    .scrap{display:none;}
+    .cta-stamp h2{border-width:3px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+    html{scroll-behavior:auto;}
+    .reveal{opacity:1; transform:none;}
+  }
+
+  :focus-visible{outline:3px solid var(--yellow); outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header>
+  <div class="nav-strip">
+    <div class="logo"><span class="logo-mark">A</span> Animation Studio</div>
+    <nav class="links">
+      <a href="#work" data-en="Work" data-ru="Работы">Work</a>
+      <a href="#services" data-en="Services" data-ru="Услуги">Services</a>
+      <a href="#process" data-en="Process" data-ru="Процесс">Process</a>
+      <a href="#contact" class="btn" data-en="Start a project" data-ru="Начать проект">Start a project</a>
+    </nav>
+    <button class="lang-switch" id="langToggle" aria-label="Switch language">
+      <span class="lang-option active" data-lang="en">EN</span><span class="lang-option" data-lang="ru">RU</span>
+    </button>
+    <button class="burger" aria-label="Open menu" onclick="document.querySelector('nav.links').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<section class="hero">
+  <video class="hero-video" autoplay muted loop playsinline preload="auto">
+  <source src="videos/background.mp4" type="video/mp4">
+</video>
+
+<div class="hero-overlay"></div>
+  <div class="scrap-field" aria-hidden="true">
+    <div class="scrap tape scrap-a draggable" style="top:8%; right:9%;">
+      <svg viewBox="0 0 100 70"><rect width="100" height="70" fill="none"/><circle cx="50" cy="35" r="22" fill="#1c1812"/><polygon points="42,25 42,45 62,35" fill="#f2c230"/></svg>
+      <div class="scrap-label">PLAY.MOV</div>
+    </div>
+    <div class="scrap tape scrap-b draggable" style="top:50%; right:22%;">
+      <svg viewBox="0 0 100 60"><rect x="4" y="14" width="92" height="32" fill="none" stroke="#f3ecdd" stroke-width="3"/><line x1="4" y1="14" x2="4" y2="46" stroke="#f3ecdd" stroke-width="3"/><line x1="30" y1="10" x2="30" y2="50" stroke="#f3ecdd" stroke-width="3"/><line x1="70" y1="10" x2="70" y2="50" stroke="#f3ecdd" stroke-width="3"/></svg>
+      <div class="scrap-label" style="color:#f3ecdd">FRAME 04</div>
+    </div>
+  </div>
+
+  <div class="hero-inner">
+    <span class="eyebrow" data-en="MOTION STUDIO&nbsp;— CUT, PASTE, PLAY" data-ru="СТУДИЯ МОУШН-ДИЗАЙНА&nbsp;— РЕЖЬ, КЛЕЙ, ИГРАЙ">MOTION STUDIO&nbsp;— CUT, PASTE, PLAY</span>
+    <h1 class="cut-title" id="cutTitleEn" style="display:none;">
+      <span class="row">
+        <span class="paper-tile">STOP</span>
+        <span class="orange-tile">THE</span>
+      </span>
+      <span class="row">
+        <span class="yellow-tile">SCROLL,</span>
+        <span class="cobalt-tile">NOT</span>
+      </span>
+      <span class="row">
+        <span class="paper-tile">THE</span>
+        <span class="orange-tile">SALE.</span>
+      </span>
+    </h1>
+<h1 class="cut-title" id="cutTitleRu">
+      <span class="row">
+        <span class="paper-tile">СТОП</span>
+        <span class="orange-tile">СКРОЛЛУ,</span>
+      </span>
+      <span class="row">
+        <span class="yellow-tile">НЕ</span>
+        <span class="cobalt-tile">ПРОДАЖАМ.</span>
+      </span>
+    </h1>
+    <p class="hero-sub" data-en="We take your brand apart&nbsp;— story, product, pitch&nbsp;— and paste it back together as animation people actually stop for. Built for business owners who are done being ignored." data-ru="Мы разбираем ваш бренд на части&nbsp;— историю, продукт, питч&nbsp;— и склеиваем обратно в анимацию, ради которой люди останавливаются. Для владельцев бизнеса, которым надоело, что их пролистывают.">We take your brand apart&nbsp;— story, product, pitch&nbsp;— and paste it back together as animation people actually stop for. Built for business owners who are done being ignored.</p>
+    <div class="hero-cta">
+      <a href="#contact" class="btn" data-en="Start a project" data-ru="Начать проект">Start a project</a>
+      <a href="#work" class="btn ghost" data-en="See the work" data-ru="Смотреть работы">See the work</a>
+    </div>
+    <div class="scroll-cue"><span class="arrow">✂</span> <span data-en="drag the scraps around&nbsp;— go on" data-ru="потаскай вырезки по доске&nbsp;— давай">drag the scraps around&nbsp;— go on</span></div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow" data-en="WHAT WE MAKE" data-ru="ЧТО МЫ ДЕЛАЕМ">WHAT WE MAKE</span>
+      <h2 data-en="Four ways to be remembered" data-ru="Четыре способа запомниться">Four ways to be remembered</h2>
+      <p data-en="Every business needs a different cut. Here's where most projects start&nbsp;— mix and match as your story needs." data-ru="Каждому бизнесу нужен свой монтаж. Вот с чего обычно начинаются проекты&nbsp;— комбинируйте под свою историю.">Every business needs a different cut. Here's where most projects start&nbsp;— mix and match as your story needs.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <span class="service-num">01</span>
+        <svg class="service-icon" viewBox="0 0 44 44"><rect x="4" y="10" width="36" height="24" fill="none" stroke="#1c1812" stroke-width="2.5"/><polygon points="18,17 18,27 28,22" fill="#1c1812"/></svg>
+        <h3 data-en="Explainer Animations" data-ru="Объясняющие ролики">Explainer Animations</h3>
+        <p data-en="Turn a confusing pitch into 60 seconds people actually watch to the end." data-ru="Превращаем запутанный питч в 60 секунд, которые досматривают до конца.">Turn a confusing pitch into 60 seconds people actually watch to the end.</p>
+      </div>
+      <div class="service-card reveal">
+        <span class="service-num">02</span>
+        <svg class="service-icon" viewBox="0 0 44 44"><rect x="12" y="4" width="20" height="36" fill="none" stroke="#1c1812" stroke-width="2.5"/><line x1="12" y1="32" x2="32" y2="32" stroke="#1c1812" stroke-width="2.5"/></svg>
+        <h3 data-en="Social Motion Ads" data-ru="Реклама для соцсетей">Social Motion Ads</h3>
+        <p data-en="Scroll-stopping clips cut to size for Reels, TikTok and Shorts." data-ru="Ролики, которые останавливают скролл,&nbsp;— под формат Reels, TikTok и Shorts.">Scroll-stopping clips cut to size for Reels, TikTok and Shorts.</p>
+      </div>
+      <div class="service-card reveal">
+        <span class="service-num">03</span>
+        <svg class="service-icon" viewBox="0 0 44 44"><circle cx="22" cy="22" r="16" fill="none" stroke="#1c1812" stroke-width="2.5"/><circle cx="22" cy="22" r="5" fill="#1c1812"/></svg>
+        <h3 data-en="Brand Idents" data-ru="Брендовые заставки">Brand Idents</h3>
+        <p data-en="A few seconds of motion that says exactly who you are, every single time." data-ru="Несколько секунд движения, которые каждый раз точно говорят, кто вы.">A few seconds of motion that says exactly who you are, every single time.</p>
+      </div>
+      <div class="service-card reveal">
+        <span class="service-num">04</span>
+        <svg class="service-icon" viewBox="0 0 44 44"><rect x="6" y="14" width="32" height="20" rx="2" fill="none" stroke="#1c1812" stroke-width="2.5"/><line x1="6" y1="20" x2="38" y2="20" stroke="#1c1812" stroke-width="2.5"/></svg>
+        <h3 data-en="Product Animations" data-ru="Анимация продукта">Product Animations</h3>
+        <p data-en="Show how it works before anyone has to read a single word." data-ru="Показываем, как это работает, ещё до того, как прочитано хоть слово.">Show how it works before anyone has to read a single word.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="process" class="filmstrip">
+  <div class="sprockets top" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow" data-en="HOW WE BUILD IT" data-ru="КАК МЫ ЭТО ДЕЛАЕМ">HOW WE BUILD IT</span>
+      <h2 data-en="One story, four frames" data-ru="Одна история, четыре кадра">One story, four frames</h2>
+    </div>
+    <div class="process-row">
+      <div class="frame reveal"><span class="fnum">01</span><h3 data-en="Brief &amp; Snip" data-ru="Бриф и вырезка">Brief &amp; Snip</h3><p data-en="We take your story apart to find the bits worth keeping." data-ru="Разбираем вашу историю на части, чтобы найти то, что стоит оставить.">We take your story apart to find the bits worth keeping.</p></div>
+      <div class="frame reveal"><span class="fnum">02</span><h3 data-en="Storyboard" data-ru="Раскадровка">Storyboard</h3><p data-en="The scraps get arranged into a shape that actually makes sense." data-ru="Вырезки складываются в форму, которая наконец обретает смысл.">The scraps get arranged into a shape that actually makes sense.</p></div>
+      <div class="frame reveal"><span class="fnum">03</span><h3 data-en="Animate" data-ru="Анимация">Animate</h3><p data-en="Every frame moves&nbsp;— nothing on your page sits still." data-ru="Каждый кадр в движении&nbsp;— ничего на странице не стоит на месте.">Every frame moves&nbsp;— nothing on your page sits still.</p></div>
+      <div class="frame reveal"><span class="fnum">04</span><h3 data-en="Deliver &amp; Play" data-ru="Сдача и запуск">Deliver &amp; Play</h3><p data-en="Cut for every platform, ready before your deadline." data-ru="Смонтировано под любую платформу и готово раньше дедлайна.">Cut for every platform, ready before your deadline.</p></div>
+    </div>
+  </div>
+  <div class="sprockets bottom" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow" data-en="RECENT CUT-UPS" data-ru="ПОСЛЕДНИЕ ВЫРЕЗКИ">RECENT CUT-UPS</span>
+      <h2 data-en="A few boards we've pinned up" data-ru="Несколько досок, что мы приколотили">A few boards we've pinned up</h2>
+      <p data-en="Placeholder cuts from the studio wall&nbsp;— swap in your real reel when you're ready." data-ru="Черновые вырезки со стены студии&nbsp;— замените на свои готовые ролики, когда будете готовы.">Placeholder cuts from the studio wall&nbsp;— swap in your real reel when you're ready.</p>
+    </div>
+    <div class="portfolio-grid">
+      <div class="clip reveal">
+        <div class="clip-bg" style="background:linear-gradient(135deg,#ff5a2a,#f2c230);"></div>
+        <div class="halftone"></div>
+        <div class="play">▶</div>
+        <div class="tag" data-en="Nordway Coffee&nbsp;— brand ident, 8s" data-ru="Nordway Coffee&nbsp;— айдентика, 8с">Nordway Coffee&nbsp;— brand ident, 8s</div>
+      </div>
+      <div class="clip reveal">
+        <div class="clip-bg" style="background:linear-gradient(135deg,#2e4fe0,#ff4fa0);"></div>
+        <div class="halftone"></div>
+        <div class="play">▶</div>
+        <div class="tag" data-en="Fenwick &amp; Row&nbsp;— product demo" data-ru="Fenwick &amp; Row&nbsp;— демо продукта">Fenwick &amp; Row&nbsp;— product demo</div>
+      </div>
+      <div class="clip reveal">
+        <div class="clip-bg" style="background:linear-gradient(135deg,#f2c230,#ff5a2a);"></div>
+        <div class="halftone"></div>
+        <div class="play">▶</div>
+        <div class="tag" data-en="Loop Fitness&nbsp;— social ad series" data-ru="Loop Fitness&nbsp;— серия рекламы для соцсетей">Loop Fitness&nbsp;— social ad series</div>
+      </div>
+      <div class="clip reveal">
+        <div class="clip-bg" style="background:linear-gradient(135deg,#1c1812,#2e4fe0);"></div>
+        <div class="halftone"></div>
+        <div class="play">▶</div>
+        <div class="tag" data-en="Harborline&nbsp;— explainer, 45s" data-ru="Harborline&nbsp;— объясняющий ролик, 45с">Harborline&nbsp;— explainer, 45s</div>
+      </div>
+      <div class="clip reveal">
+        <div class="clip-bg" style="background:linear-gradient(135deg,#ff4fa0,#f2c230);"></div>
+        <div class="halftone"></div>
+        <div class="play">▶</div>
+        <div class="tag" data-en="Study Nook&nbsp;— launch teaser" data-ru="Study Nook&nbsp;— тизер запуска">Study Nook&nbsp;— launch teaser</div>
+      </div>
+      <div class="clip reveal">
+        <div class="clip-bg" style="background:linear-gradient(135deg,#2e4fe0,#1c1812);"></div>
+        <div class="halftone"></div>
+        <div class="play">▶</div>
+        <div class="tag" data-en="Amberfield&nbsp;— brand ident, 6s" data-ru="Amberfield&nbsp;— айдентика, 6с">Amberfield&nbsp;— brand ident, 6s</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow" data-en="WORD ON THE BOARD" data-ru="ОТЗЫВЫ НА ДОСКЕ">WORD ON THE BOARD</span>
+      <h2 data-en="People we've made things for" data-ru="Люди, для которых мы это делали">People we've made things for</h2>
+    </div>
+    <div class="testi-board">
+      <div class="testi reveal">
+        <span data-en="&quot;They turned our clunky pitch deck into a 40-second clip. Our close rate on cold outreach doubled the month we started using it.&quot;" data-ru="«Они превратили нашу неуклюжую презентацию в 40-секундный ролик. В тот же месяц конверсия холодных обращений выросла вдвое.»">"They turned our clunky pitch deck into a 40-second clip. Our close rate on cold outreach doubled the month we started using it."</span>
+        <div class="who" data-en="— Priya Kessler, Founder, Nordway Coffee" data-ru="— Прия Кесслер, основательница Nordway Coffee">— Priya Kessler, Founder, Nordway Coffee</div>
+      </div>
+      <div class="testi reveal">
+        <span data-en="&quot;Every draft felt handmade, not templated. First animation we've ever made people rewatch on purpose.&quot;" data-ru="«Каждый вариант ощущался сделанным вручную, а не по шаблону. Впервые наша анимация&nbsp;— то, что люди пересматривают специально.»">"Every draft felt handmade, not templated. First animation we've ever made people rewatch on purpose."</span>
+        <div class="who" data-en="— Tomas Vidal, Fenwick &amp; Row" data-ru="— Томас Видаль, Fenwick &amp; Row">— Tomas Vidal, Fenwick &amp; Row</div>
+      </div>
+      <div class="testi reveal">
+        <span data-en="&quot;Fast, weird in the right places, and it actually looked like us. That's rarer than it should be.&quot;" data-ru="«Быстро, в меру странно там, где нужно, и это правда похоже на нас. Такое встречается реже, чем должно бы.»">"Fast, weird in the right places, and it actually looked like us. That's rarer than it should be."</span>
+        <div class="who" data-en="— Dee Okafor, Loop Fitness" data-ru="— Ди Окафор, Loop Fitness">— Dee Okafor, Loop Fitness</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-stamp" id="contact">
+  <span class="eyebrow" style="background:var(--ink); color:var(--paper);" data-en="GOT A STORY WORTH ANIMATING?" data-ru="ЕСТЬ ИСТОРИЯ, ДОСТОЙНАЯ АНИМАЦИИ?">GOT A STORY WORTH ANIMATING?</span>
+  <h2 data-en-html="LET'S CUT<br>SOMETHING UP." data-ru-html="ДАВАЙТЕ ЧТО-НИБУДЬ<br>ВЫРЕЖЕМ.">LET'S CUT<br>SOMETHING UP.</h2>
+  <p data-en="Tell us about your business&nbsp;— we'll tell you what it looks like in motion." data-ru="Расскажите о своём бизнесе&nbsp;— мы покажем, как это выглядит в движении.">Tell us about your business&nbsp;— we'll tell you what it looks like in motion.</p>
+  <a href="mailto:hello@animationdesignbureau.studio" class="btn">hello@animationdesignbureau.studio</a>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div class="foot-col">
+      <h4>ANIMATION STUDIO</h4>
+      <a href="#work" data-en="Work" data-ru="Работы">Work</a>
+      <a href="#services" data-en="Services" data-ru="Услуги">Services</a>
+      <a href="#process" data-en="Process" data-ru="Процесс">Process</a>
+    </div>
+    <div class="foot-col">
+      <h4 data-en="STUDIO" data-ru="СТУДИЯ">STUDIO</h4>
+      <a href="#contact" data-en="Start a project" data-ru="Начать проект">Start a project</a>
+      <a href="mailto:hello@animationdesignbureau.studio">hello@animationdesignbureau.studio</a>
+    </div>
+    <div class="foot-col">
+      <h4 data-en="FOLLOW" data-ru="МЫ В СЕТИ">FOLLOW</h4>
+      <a href="#">Instagram</a>
+      <a href="#">Behance</a>
+      <a href="#">LinkedIn</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span data-en="© 2026 Animation Studio. All scraps reserved." data-ru="© 2026 Animation Studio. Все вырезки защищены.">© 2026 Animation Studio. All scraps reserved.</span>
+    <span data-en="Cut, pasted &amp; animated in-house." data-ru="Вырезано, склеено и анимировано у нас в студии.">Cut, pasted &amp; animated in-house.</span>
+  </div>
+</footer>
+
+<script>
+  // scroll reveal
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('in-view'); io.unobserve(e.target); }
+    });
+  }, {threshold:0.15});
+  revealEls.forEach(el=>io.observe(el));
+
+  // hero mouse parallax on scraps
+  const scrapField = document.querySelector('.scrap-field');
+  const hero = document.querySelector('.hero');
+  if(hero && scrapField){
+    hero.addEventListener('mousemove', (e)=>{
+      const rect = hero.getBoundingClientRect();
+      const x = (e.clientX - rect.left)/rect.width - 0.5;
+      const y = (e.clientY - rect.top)/rect.height - 0.5;
+      scrapField.querySelectorAll('.scrap').forEach((s, i)=>{
+        const depth = (i+1)*10;
+        s.style.setProperty('--px', (x*depth)+'px');
+        s.style.setProperty('--py', (y*depth)+'px');
+        if(!s.dataset.dragging && !s.dataset.wasDragged){
+          s.style.transform = (s.style.transform || '').replace(/translate\([^)]*\)/,'') ;
+          s.style.marginLeft = (x*depth)+'px';
+          s.style.marginTop = (y*depth)+'px';
+        }
+      });
+    });
+  }
+
+  // draggable scraps&nbsp;— position stays relative to the hero, so it scrolls
+  // away with the section instead of sticking to the viewport after a drag.
+  document.querySelectorAll('.draggable').forEach(el=>{
+    let offsetX=0, offsetY=0, dragging=false;
+    el.addEventListener('pointerdown', (e)=>{
+      dragging = true;
+      el.dataset.dragging = "1";
+      el.setPointerCapture(e.pointerId);
+      const heroRect = hero.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      offsetX = e.clientX - elRect.left;
+      offsetY = e.clientY - elRect.top;
+      el.style.position = 'absolute';
+      el.style.left = (elRect.left - heroRect.left) + 'px';
+      el.style.top = (elRect.top - heroRect.top) + 'px';
+      el.style.right = 'auto'; el.style.margin = '0';
+      el.style.zIndex = 600;
+    });
+    el.addEventListener('pointermove', (e)=>{
+      if(!dragging) return;
+      const heroRect = hero.getBoundingClientRect();
+      el.style.left = (e.clientX - heroRect.left - offsetX) + 'px';
+      el.style.top = (e.clientY - heroRect.top - offsetY) + 'px';
+    });
+    const stop = (e)=>{
+      dragging = false;
+      el.dataset.wasDragged = "1";
+      delete el.dataset.dragging;
+      try{ el.releasePointerCapture(e.pointerId); }catch(err){}
+    };
+    el.addEventListener('pointerup', stop);
+    el.addEventListener('pointercancel', stop);
+  });
+
+  // language switch (EN / RU)
+  let currentLang = 'ru';
+  applyLang('ru');
+  function applyLang(lang){
+    document.querySelectorAll('[data-en]').forEach(el=>{
+      el.textContent = el.dataset[lang] || el.dataset.en;
+    });
+    document.querySelectorAll('[data-en-html]').forEach(el=>{
+      el.innerHTML = el.dataset[lang+'Html'] || el.dataset.enHtml;
+    });
+    const en = document.getElementById('cutTitleEn');
+    const ru = document.getElementById('cutTitleRu');
+    if(en && ru){
+      en.style.display = lang === 'en' ? 'flex' : 'none';
+      ru.style.display = lang === 'ru' ? 'flex' : 'none';
+    }
+    document.querySelectorAll('.lang-option').forEach(o=>{
+      o.classList.toggle('active', o.dataset.lang === lang);
+    });
+    document.documentElement.lang = lang;
+    currentLang = lang;
+  }
+  const langToggle = document.getElementById('langToggle');
+  if(langToggle){
+    langToggle.addEventListener('click', ()=> applyLang(currentLang === 'en' ? 'ru' : 'en'));
+  }
+
+  // mobile nav toggle styling
+  const style = document.createElement('style');
+  style.textContent = `
+    @media (max-width:900px){
+      nav.links.open{
+        display:flex !important; position:fixed; top:64px; left:0; right:0;
+        background:var(--canvas); flex-direction:column; padding:1.5rem 6vw;
+        border-bottom:3px solid var(--paper); z-index:400;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+</script>
+
+</body>
+</html>
