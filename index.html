@@ -3,7 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Animation Studio&nbsp;— Motion that stops the scroll</title>
+<title>Animation Studio&nbsp;— моушн-дизайн, который останавливает скролл</title>
+<meta name="description" content="Animation Studio создаёт моушн-дизайн, объясняющие ролики, рекламу для соцсетей, брендовые заставки и продуктовую анимацию для бизнеса.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Animation Studio — моушн-дизайн, который останавливает скролл">
+<meta property="og:description" content="Анимация, которая останавливает скролл, для владельцев бизнеса, которым надоело, что их пролистывают.">
+<meta property="og:image" content="og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Animation Studio — моушн-дизайн, который останавливает скролл">
+<meta name="twitter:description" content="Анимация, которая останавливает скролл, для владельцев бизнеса, которым надоело, что их пролистывают.">
+<meta name="twitter:image" content="og-image.png">
+<meta name="theme-color" content="#171512">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
 
 <style>
 @font-face {
@@ -317,13 +334,16 @@ font-family:'NewCMMono', monospace;
     display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem;
   }
   .clip{
-    position:relative; overflow:hidden;
+    position:relative; overflow:hidden; display:block; padding:0;
     border:2px solid var(--paper);
-    aspect-ratio:4/3;
+    aspect-ratio:4/3; width:100%;
+    background:var(--canvas-light); color:inherit;
     cursor:pointer;
   }
   .clip .clip-bg{
     position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
     background-size:cover; background-position:center;
     transition:transform .5s ease;
   }
@@ -348,6 +368,38 @@ font-family:'NewCMMono', monospace;
     background:var(--orange); border:2px solid var(--ink); border-radius:50%;
     display:flex; align-items:center; justify-content:center;
   }
+
+  .video-modal{
+    position:fixed; inset:0; z-index:1200;
+    display:none; align-items:center; justify-content:center;
+    padding:6vw; background:rgba(23,21,18,.86);
+  }
+  .video-modal.is-open{display:flex;}
+  .video-modal__dialog{
+    width:min(1040px, 100%);
+    background:var(--paper); color:var(--ink);
+    border:3px solid var(--ink);
+    box-shadow:10px 12px 0 rgba(0,0,0,.45);
+    transform:rotate(-.6deg);
+  }
+  .video-modal__bar{
+    display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    padding:.8rem 1rem; border-bottom:3px solid var(--ink);
+  }
+  .video-modal__title{
+    font-family:'NewCMMono', monospace; font-size:.85rem;
+    text-transform:uppercase; letter-spacing:.05em;
+  }
+  .video-modal__close{
+    width:38px; height:38px;
+    border:2px solid var(--ink); background:var(--orange); color:var(--ink);
+    font:700 1.3rem/1 'NewCMMono', monospace; cursor:pointer;
+  }
+  .video-modal__video{
+    width:100%; max-height:76vh; display:block; background:#000;
+  }
+
+  body.modal-open{overflow:hidden;}
 
   /* ---------------- TESTIMONIALS ---------------- */
   .testi-board{
@@ -561,42 +613,54 @@ font-family:'NewCMMono', monospace;
       <p data-en="Placeholder cuts from the studio wall&nbsp;— swap in your real reel when you're ready." data-ru="Черновые вырезки со стены студии&nbsp;— замените на свои готовые ролики, когда будете готовы.">Placeholder cuts from the studio wall&nbsp;— swap in your real reel when you're ready.</p>
     </div>
     <div class="portfolio-grid">
-      <div class="clip reveal">
-        <div class="clip-bg" style="background:linear-gradient(135deg,#ff5a2a,#f2c230);"></div>
+      <button class="clip reveal" type="button" data-video="videos/fastotc-collage.mp4" aria-label="Open case video">
+        <video class="clip-bg" muted loop playsinline preload="metadata" aria-hidden="true">
+          <source src="videos/fastotc-collage.mp4" type="video/mp4">
+        </video>
         <div class="halftone"></div>
         <div class="play">▶</div>
         <div class="tag" data-en="Nordway Coffee&nbsp;— brand ident, 8s" data-ru="Nordway Coffee&nbsp;— айдентика, 8с">Nordway Coffee&nbsp;— brand ident, 8s</div>
-      </div>
-      <div class="clip reveal">
-        <div class="clip-bg" style="background:linear-gradient(135deg,#2e4fe0,#ff4fa0);"></div>
+      </button>
+      <button class="clip reveal" type="button" data-video="videos/fastotc.mp4" aria-label="Open case video">
+        <video class="clip-bg" muted loop playsinline preload="metadata" aria-hidden="true">
+          <source src="videos/fastotc.mp4" type="video/mp4">
+        </video>
         <div class="halftone"></div>
         <div class="play">▶</div>
         <div class="tag" data-en="Fenwick &amp; Row&nbsp;— product demo" data-ru="Fenwick &amp; Row&nbsp;— демо продукта">Fenwick &amp; Row&nbsp;— product demo</div>
-      </div>
-      <div class="clip reveal">
-        <div class="clip-bg" style="background:linear-gradient(135deg,#f2c230,#ff5a2a);"></div>
+      </button>
+      <button class="clip reveal" type="button" data-video="videos/pepperpromo.mp4" aria-label="Open case video">
+        <video class="clip-bg" muted loop playsinline preload="metadata" aria-hidden="true">
+          <source src="videos/pepperpromo.mp4" type="video/mp4">
+        </video>
         <div class="halftone"></div>
         <div class="play">▶</div>
         <div class="tag" data-en="Loop Fitness&nbsp;— social ad series" data-ru="Loop Fitness&nbsp;— серия рекламы для соцсетей">Loop Fitness&nbsp;— social ad series</div>
-      </div>
-      <div class="clip reveal">
-        <div class="clip-bg" style="background:linear-gradient(135deg,#1c1812,#2e4fe0);"></div>
+      </button>
+      <button class="clip reveal" type="button" data-video="videos/revolut-style.mp4" aria-label="Open case video">
+        <video class="clip-bg" muted loop playsinline preload="metadata" aria-hidden="true">
+          <source src="videos/revolut-style.mp4" type="video/mp4">
+        </video>
         <div class="halftone"></div>
         <div class="play">▶</div>
         <div class="tag" data-en="Harborline&nbsp;— explainer, 45s" data-ru="Harborline&nbsp;— объясняющий ролик, 45с">Harborline&nbsp;— explainer, 45s</div>
-      </div>
-      <div class="clip reveal">
-        <div class="clip-bg" style="background:linear-gradient(135deg,#ff4fa0,#f2c230);"></div>
+      </button>
+      <button class="clip reveal" type="button" data-video="videos/utekayut.mp4" aria-label="Open case video">
+        <video class="clip-bg" muted loop playsinline preload="metadata" aria-hidden="true">
+          <source src="videos/utekayut.mp4" type="video/mp4">
+        </video>
         <div class="halftone"></div>
         <div class="play">▶</div>
         <div class="tag" data-en="Study Nook&nbsp;— launch teaser" data-ru="Study Nook&nbsp;— тизер запуска">Study Nook&nbsp;— launch teaser</div>
-      </div>
-      <div class="clip reveal">
-        <div class="clip-bg" style="background:linear-gradient(135deg,#2e4fe0,#1c1812);"></div>
+      </button>
+      <button class="clip reveal" type="button" data-video="videos/teryaesh.mp4" aria-label="Open case video">
+        <video class="clip-bg" muted loop playsinline preload="metadata" aria-hidden="true">
+          <source src="videos/teryaesh.mp4" type="video/mp4">
+        </video>
         <div class="halftone"></div>
         <div class="play">▶</div>
         <div class="tag" data-en="Amberfield&nbsp;— brand ident, 6s" data-ru="Amberfield&nbsp;— айдентика, 6с">Amberfield&nbsp;— brand ident, 6s</div>
-      </div>
+      </button>
     </div>
   </div>
 </section>
@@ -656,6 +720,16 @@ font-family:'NewCMMono', monospace;
     <span data-en="Cut, pasted &amp; animated in-house." data-ru="Вырезано, склеено и анимировано у нас в студии.">Cut, pasted &amp; animated in-house.</span>
   </div>
 </footer>
+
+<div class="video-modal" id="videoModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle">
+  <div class="video-modal__dialog">
+    <div class="video-modal__bar">
+      <div class="video-modal__title" id="videoModalTitle">Case video</div>
+      <button class="video-modal__close" type="button" aria-label="Close video">×</button>
+    </div>
+    <video class="video-modal__video" controls playsinline preload="metadata"></video>
+  </div>
+</div>
 
 <script>
   // scroll reveal
@@ -723,6 +797,37 @@ font-family:'NewCMMono', monospace;
   });
 
   // language switch (EN / RU)
+  const seoContent = {
+    en: {
+      title: 'Animation Studio — Motion that stops the scroll',
+      description: 'Animation Studio creates scroll-stopping motion design, explainers, social ads, brand idents and product animations for businesses.',
+      ogDescription: 'Scroll-stopping animation for business owners who are done being ignored.',
+      locale: 'en_US'
+    },
+    ru: {
+      title: 'Animation Studio — моушн-дизайн, который останавливает скролл',
+      description: 'Animation Studio создаёт моушн-дизайн, объясняющие ролики, рекламу для соцсетей, брендовые заставки и продуктовую анимацию для бизнеса.',
+      ogDescription: 'Анимация, которая останавливает скролл, для владельцев бизнеса, которым надоело, что их пролистывают.',
+      locale: 'ru_RU'
+    }
+  };
+
+  function updateMeta(selector, value){
+    const el = document.querySelector(selector);
+    if(el) el.setAttribute('content', value);
+  }
+
+  function applySeoLang(lang){
+    const seo = seoContent[lang] || seoContent.en;
+    document.title = seo.title;
+    updateMeta('meta[name="description"]', seo.description);
+    updateMeta('meta[property="og:title"]', seo.title);
+    updateMeta('meta[property="og:description"]', seo.ogDescription);
+    updateMeta('meta[property="og:locale"]', seo.locale);
+    updateMeta('meta[name="twitter:title"]', seo.title);
+    updateMeta('meta[name="twitter:description"]', seo.ogDescription);
+  }
+
   let currentLang = 'ru';
   applyLang('ru');
   function applyLang(lang){
@@ -742,12 +847,56 @@ font-family:'NewCMMono', monospace;
       o.classList.toggle('active', o.dataset.lang === lang);
     });
     document.documentElement.lang = lang;
+    applySeoLang(lang);
     currentLang = lang;
   }
   const langToggle = document.getElementById('langToggle');
   if(langToggle){
     langToggle.addEventListener('click', ()=> applyLang(currentLang === 'en' ? 'ru' : 'en'));
   }
+
+  // portfolio videos and modal
+  const caseClips = document.querySelectorAll('.clip[data-video]');
+  const videoModal = document.getElementById('videoModal');
+  const modalVideo = videoModal?.querySelector('.video-modal__video');
+  const modalTitle = document.getElementById('videoModalTitle');
+  const closeModalBtn = videoModal?.querySelector('.video-modal__close');
+
+  caseClips.forEach(clip=>{
+    const preview = clip.querySelector('video');
+    clip.addEventListener('mouseenter', ()=> preview?.play().catch(()=>{}));
+    clip.addEventListener('mouseleave', ()=>{
+      if(preview){ preview.pause(); preview.currentTime = 0; }
+    });
+    clip.addEventListener('click', ()=>{
+      if(!videoModal || !modalVideo) return;
+      const tag = clip.querySelector('.tag');
+      modalTitle.textContent = tag?.textContent || 'Case video';
+      modalVideo.src = clip.dataset.video;
+      videoModal.classList.add('is-open');
+      videoModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+      modalVideo.play().catch(()=>{});
+    });
+  });
+
+  function closeVideoModal(){
+    if(!videoModal || !modalVideo) return;
+    modalVideo.pause();
+    modalVideo.removeAttribute('src');
+    modalVideo.load();
+    videoModal.classList.remove('is-open');
+    videoModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  }
+
+  closeModalBtn?.addEventListener('click', closeVideoModal);
+  videoModal?.addEventListener('click', (e)=>{
+    if(e.target === videoModal) closeVideoModal();
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape' && videoModal?.classList.contains('is-open')) closeVideoModal();
+  });
 
   // mobile nav toggle styling
   const style = document.createElement('style');
