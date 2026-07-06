@@ -1,0 +1,25 @@
+{
+  "name": "Animation Studio",
+  "short_name": "Animation Studio",
+  "description": "Scroll-stopping motion design, explainers, social ads, brand idents and product animations for businesses.",
+  "icons": [
+    {
+      "src": "web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#171512",
+  "background_color": "#171512",
+  "display": "standalone",
+  "start_url": ".",
+  "scope": ".",
+  "lang": "ru"
+}
