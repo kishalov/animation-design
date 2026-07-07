@@ -74,6 +74,96 @@ const testimonials = [
   ['Fast, weird in the right places, and it actually looked like us. That\'s rarer than it should be.', 'Быстро, в меру странно там, где нужно, и это правда похоже на нас. Такое встречается реже, чем должно бы.', '— Dee Okafor, Loop Fitness', '— Ди Окафор, Loop Fitness']
 ];
 
+const siteColors = ['#ff5a2a', '#2e4fe0', '#f2c230', '#f3ecdd'];
+
+const achievementPhrases = [
+  'Так держать!',
+  'Новый рекорд!',
+  'Комбо пошло!',
+  'Красиво лопнуло!',
+  'Скорость растёт!',
+  'Вот это клик!',
+  'XP машина!',
+  'Уровень ап!'
+];
+
+function randomBetween(min, max) {
+  return min + Math.random() * (max - min);
+}
+
+function uid() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  return `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function xpForLevel(level) {
+  return Math.floor(42 * Math.pow(level - 1, 1.65));
+}
+
+function levelFromXp(xp) {
+  let level = 1;
+  while (xp >= xpForLevel(level + 1)) level += 1;
+  return level;
+}
+
+function gameConfig(level) {
+  if (level >= 20) {
+    return { count: 6, minSize: 34, maxSize: 78, minDuration: 4.8, maxDuration: 8.5, gradients: true, evasive: true, pulse: true };
+  }
+  if (level >= 11) {
+    return { count: 5, minSize: 38, maxSize: 86, minDuration: 6, maxDuration: 10, gradients: true, evasive: false, pulse: false };
+  }
+  if (level >= 6) {
+    return { count: 5, minSize: 30, maxSize: 72, minDuration: 7, maxDuration: 12, gradients: true, evasive: false, pulse: false };
+  }
+  return { count: 4, minSize: 58, maxSize: 96, minDuration: 11, maxDuration: 17, gradients: false, evasive: false, pulse: false };
+}
+
+function blobPath(pointCount = 9) {
+  const points = Array.from({ length: pointCount }, (_, index) => {
+    const angle = (Math.PI * 2 * index) / pointCount;
+    const radius = randomBetween(28, 48);
+    return {
+      x: 50 + Math.cos(angle) * radius,
+      y: 50 + Math.sin(angle) * radius
+    };
+  });
+
+  return points.map((point, index) => {
+    const next = points[(index + 1) % points.length];
+    const midX = (point.x + next.x) / 2;
+    const midY = (point.y + next.y) / 2;
+    return `${index === 0 ? `M ${midX} ${midY}` : ''} Q ${next.x} ${next.y} ${(next.x + points[(index + 2) % points.length].x) / 2} ${(next.y + points[(index + 2) % points.length].y) / 2}`;
+  }).join(' ') + ' Z';
+}
+
+function createShape(level, sharedColor) {
+  const config = gameConfig(level);
+  const colorA = level <= 5 ? sharedColor : siteColors[Math.floor(Math.random() * siteColors.length)];
+  let colorB = siteColors[Math.floor(Math.random() * siteColors.length)];
+  if (colorB === colorA) colorB = '#171512';
+
+  return {
+    id: uid(),
+    x: randomBetween(10, 82),
+    y: randomBetween(12, 66),
+    size: randomBetween(config.minSize, config.maxSize),
+    colorA,
+    colorB,
+    gradient: config.gradients && Math.random() > 0.25,
+    path: blobPath(Math.floor(randomBetween(7, 12))),
+    duration: randomBetween(config.minDuration, config.maxDuration),
+    delay: randomBetween(-8, 0),
+    floatX: randomBetween(-34, 34),
+    floatY: randomBetween(-28, 28),
+    rotate: randomBetween(-28, 28)
+  };
+}
+
+function shapeXp(level) {
+  return 5 + Math.floor(level / 3) * 2;
+}
+
 function Icon({ type }) {
   if (type === 'phone') {
     return <svg className="service-icon" viewBox="0 0 44 44"><rect x="12" y="4" width="20" height="36" fill="none" stroke="#1c1812" strokeWidth="2.5"/><line x1="12" y1="32" x2="32" y2="32" stroke="#1c1812" strokeWidth="2.5"/></svg>;
@@ -95,9 +185,21 @@ function updateMeta(selector, value) {
 export default function HomePage() {
   const [lang, setLang] = useState('ru');
   const [modalCase, setModalCase] = useState(null);
+  const [xp, setXp] = useState(0);
+  const [shapes, setShapes] = useState([]);
+  const [particles, setParticles] = useState([]);
+  const [floatingScores, setFloatingScores] = useState([]);
+  const [achievement, setAchievement] = useState(null);
+  const [mouse, setMouse] = useState(null);
   const heroRef = useRef(null);
+  const sharedShapeColor = useRef(siteColors[Math.floor(Math.random() * siteColors.length)]);
 
   const t = (en, ru) => (lang === 'ru' ? ru : en);
+  const level = levelFromXp(xp);
+  const nextLevelXp = xpForLevel(level + 1);
+  const previousLevelXp = xpForLevel(level);
+  const levelProgress = Math.min(100, Math.round(((xp - previousLevelXp) / Math.max(1, nextLevelXp - previousLevelXp)) * 100));
+  const currentConfig = gameConfig(level);
 
   useEffect(() => {
     const seo = seoContent[lang];
@@ -126,81 +228,83 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    const hero = heroRef.current;
-    const scrapField = document.querySelector('.scrap-field');
-    if (!hero || !scrapField) return undefined;
-
-    const onMouseMove = (event) => {
-      const rect = hero.getBoundingClientRect();
-      const x = (event.clientX - rect.left) / rect.width - 0.5;
-      const y = (event.clientY - rect.top) / rect.height - 0.5;
-      scrapField.querySelectorAll('.scrap').forEach((scrap, index) => {
-        const depth = (index + 1) * 10;
-        if (!scrap.dataset.dragging && !scrap.dataset.wasDragged) {
-          scrap.style.marginLeft = `${x * depth}px`;
-          scrap.style.marginTop = `${y * depth}px`;
-        }
-      });
-    };
-
-    hero.addEventListener('mousemove', onMouseMove);
-    return () => hero.removeEventListener('mousemove', onMouseMove);
-  }, []);
+    setShapes((currentShapes) => {
+      const config = gameConfig(level);
+      if (currentShapes.length >= config.count) return currentShapes.slice(0, config.count);
+      return [
+        ...currentShapes,
+        ...Array.from({ length: config.count - currentShapes.length }, () => createShape(level, sharedShapeColor.current))
+      ];
+    });
+  }, [level]);
 
   useEffect(() => {
-    const hero = heroRef.current;
-    if (!hero) return undefined;
-    const cleanups = [];
-
-    document.querySelectorAll('.draggable').forEach((el) => {
-      let offsetX = 0;
-      let offsetY = 0;
-      let dragging = false;
-
-      const onPointerDown = (event) => {
-        dragging = true;
-        el.dataset.dragging = '1';
-        el.setPointerCapture(event.pointerId);
-        const heroRect = hero.getBoundingClientRect();
-        const elRect = el.getBoundingClientRect();
-        offsetX = event.clientX - elRect.left;
-        offsetY = event.clientY - elRect.top;
-        el.style.position = 'absolute';
-        el.style.left = `${elRect.left - heroRect.left}px`;
-        el.style.top = `${elRect.top - heroRect.top}px`;
-        el.style.right = 'auto';
-        el.style.margin = '0';
-        el.style.zIndex = 600;
-      };
-
-      const onPointerMove = (event) => {
-        if (!dragging) return;
-        const heroRect = hero.getBoundingClientRect();
-        el.style.left = `${event.clientX - heroRect.left - offsetX}px`;
-        el.style.top = `${event.clientY - heroRect.top - offsetY}px`;
-      };
-
-      const stop = (event) => {
-        dragging = false;
-        el.dataset.wasDragged = '1';
-        delete el.dataset.dragging;
-        try { el.releasePointerCapture(event.pointerId); } catch {}
-      };
-
-      el.addEventListener('pointerdown', onPointerDown);
-      el.addEventListener('pointermove', onPointerMove);
-      el.addEventListener('pointerup', stop);
-      el.addEventListener('pointercancel', stop);
-      cleanups.push(() => {
-        el.removeEventListener('pointerdown', onPointerDown);
-        el.removeEventListener('pointermove', onPointerMove);
-        el.removeEventListener('pointerup', stop);
-        el.removeEventListener('pointercancel', stop);
-      });
+    const timers = [];
+    particles.forEach((particle) => {
+      timers.push(setTimeout(() => setParticles((items) => items.filter((item) => item.id !== particle.id)), 900));
     });
+    floatingScores.forEach((score) => {
+      timers.push(setTimeout(() => setFloatingScores((items) => items.filter((item) => item.id !== score.id)), 950));
+    });
+    return () => timers.forEach((timer) => clearTimeout(timer));
+  }, [particles, floatingScores]);
 
-    return () => cleanups.forEach((cleanup) => cleanup());
-  }, []);
+  useEffect(() => {
+    if (!achievement) return undefined;
+    const timer = setTimeout(() => setAchievement(null), 2200);
+    return () => clearTimeout(timer);
+  }, [achievement]);
+
+  const handleGameMouseMove = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    setMouse({
+      x: ((event.clientX - rect.left) / rect.width) * 100,
+      y: ((event.clientY - rect.top) / rect.height) * 100
+    });
+  };
+
+  const popShape = (shape, event) => {
+    event.stopPropagation();
+    const hero = heroRef.current;
+    const rect = hero?.getBoundingClientRect();
+    const burstX = rect ? event.clientX - rect.left : 0;
+    const burstY = rect ? event.clientY - rect.top : 0;
+    const points = shapeXp(level);
+    const previousLevel = level;
+
+    setShapes((items) => [
+      ...items.filter((item) => item.id !== shape.id),
+      createShape(level, sharedShapeColor.current)
+    ].slice(0, gameConfig(level).count));
+
+    setParticles((items) => [
+      ...items,
+      ...Array.from({ length: 16 }, () => ({
+        id: uid(),
+        x: burstX,
+        y: burstY,
+        color: shape.gradient ? shape.colorB : shape.colorA,
+        dx: randomBetween(-90, 90),
+        dy: randomBetween(-90, 90),
+        size: randomBetween(4, 10)
+      }))
+    ]);
+
+    setFloatingScores((items) => [
+      ...items,
+      { id: uid(), x: burstX, y: burstY, value: points }
+    ]);
+
+    setXp((currentXp) => {
+      const nextXp = currentXp + points;
+      const nextLevel = levelFromXp(nextXp);
+      if (nextLevel > previousLevel || nextXp % 50 < points) {
+        const phrase = achievementPhrases[Math.floor(Math.random() * achievementPhrases.length)];
+        setAchievement(nextLevel > previousLevel ? `${phrase} LVL ${nextLevel}` : phrase);
+      }
+      return nextXp;
+    });
+  };
 
   useEffect(() => {
     document.body.classList.toggle('modal-open', Boolean(modalCase));
@@ -245,14 +349,79 @@ export default function HomePage() {
           <source src="/videos/background.mp4" type="video/mp4" />
         </video>
         <div className="hero-overlay" />
-        <div className="scrap-field" aria-hidden="true">
-          <div className="scrap tape scrap-a draggable" style={{ top: '8%', right: '9%' }}>
-            <svg viewBox="0 0 100 70"><rect width="100" height="70" fill="none"/><circle cx="50" cy="35" r="22" fill="#1c1812"/><polygon points="42,25 42,45 62,35" fill="#f2c230"/></svg>
-            <div className="scrap-label">PLAY.MOV</div>
-          </div>
-          <div className="scrap tape scrap-b draggable" style={{ top: '50%', right: '22%' }}>
-            <svg viewBox="0 0 100 60"><rect x="4" y="14" width="92" height="32" fill="none" stroke="#f3ecdd" strokeWidth="3"/><line x1="4" y1="14" x2="4" y2="46" stroke="#f3ecdd" strokeWidth="3"/><line x1="30" y1="10" x2="30" y2="50" stroke="#f3ecdd" strokeWidth="3"/><line x1="70" y1="10" x2="70" y2="50" stroke="#f3ecdd" strokeWidth="3"/></svg>
-            <div className="scrap-label" style={{ color: '#f3ecdd' }}>FRAME 04</div>
+        <div className="hero-game" aria-label={t('XP blob popping mini-game', 'Мини-игра: лопайте XP-фигуры')} onMouseMove={handleGameMouseMove} onMouseLeave={() => setMouse(null)}>
+          {achievement && <div className="achievement-pop" aria-live="polite">{achievement}</div>}
+          {shapes.map((shape) => {
+            const centerX = shape.x;
+            const centerY = shape.y;
+            let dodgeX = 0;
+            let dodgeY = 0;
+            if (currentConfig.evasive && mouse) {
+              const dx = centerX - mouse.x;
+              const dy = centerY - mouse.y;
+              const distance = Math.max(1, Math.hypot(dx, dy));
+              if (distance < 18) {
+                const force = (18 - distance) * 1.8;
+                dodgeX = (dx / distance) * force;
+                dodgeY = (dy / distance) * force;
+              }
+            }
+
+            return (
+              <button
+                className={`game-shape ${currentConfig.pulse ? 'is-pulsing' : ''}`}
+                type="button"
+                key={shape.id}
+                onClick={(event) => popShape(shape, event)}
+                aria-label={t(`Pop shape for ${shapeXp(level)} XP`, `Лопнуть фигуру за ${shapeXp(level)} XP`)}
+                style={{
+                  left: `${shape.x}%`,
+                  top: `${shape.y}%`,
+                  width: `${shape.size}px`,
+                  height: `${shape.size}px`,
+                  '--float-x': `${shape.floatX}px`,
+                  '--float-y': `${shape.floatY}px`,
+                  '--dodge-x': `${dodgeX}px`,
+                  '--dodge-y': `${dodgeY}px`,
+                  '--shape-rotate': `${shape.rotate}deg`,
+                  animationDuration: `${shape.duration}s`,
+                  animationDelay: `${shape.delay}s`
+                }}
+              >
+                <svg viewBox="0 0 100 100" aria-hidden="true">
+                  <defs>
+                    <linearGradient id={`blob-gradient-${shape.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor={shape.colorA} />
+                      <stop offset="100%" stopColor={shape.colorB} />
+                    </linearGradient>
+                  </defs>
+                  <path d={shape.path} fill={shape.gradient ? `url(#blob-gradient-${shape.id})` : shape.colorA} />
+                </svg>
+              </button>
+            );
+          })}
+          {particles.map((particle) => (
+            <span
+              className="burst-particle"
+              key={particle.id}
+              style={{
+                left: `${particle.x}px`,
+                top: `${particle.y}px`,
+                width: `${particle.size}px`,
+                height: `${particle.size}px`,
+                background: particle.color,
+                '--particle-x': `${particle.dx}px`,
+                '--particle-y': `${particle.dy}px`
+              }}
+            />
+          ))}
+          {floatingScores.map((score) => (
+            <span className="floating-xp" key={score.id} style={{ left: `${score.x}px`, top: `${score.y}px` }}>+{score.value} XP</span>
+          ))}
+          <div className="xp-score">
+            <span>{t('Score', 'Счёт')}: {xp} XP</span>
+            <strong>LVL {level}</strong>
+            <div className="xp-progress" aria-hidden="true"><span style={{ width: `${levelProgress}%` }} /></div>
           </div>
         </div>
 
@@ -272,7 +441,7 @@ export default function HomePage() {
             <a href="#contact" className="btn">{t('Start a project', 'Начать проект')}</a>
             <a href="#work" className="btn ghost">{t('See the work', 'Смотреть работы')}</a>
           </div>
-          <div className="scroll-cue"><span className="arrow">✂</span> <span>{t('drag the scraps around — go on', 'потаскай вырезки по доске — давай')}</span></div>
+          <div className="scroll-cue"><span className="arrow">✂</span> <span>{t('pop the blobs — collect XP', 'лопай фигуры — собирай XP')}</span></div>
         </div>
       </section>
 
