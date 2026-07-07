@@ -32,7 +32,7 @@ const services = [
     enTitle: 'Social Motion Ads',
     ruTitle: 'Реклама для соцсетей',
     enText: 'Scroll-stopping clips cut to size for Reels, TikTok and Shorts.',
-    ruText: 'Ролики, которые останавливают скролл, — под формат Reels, TikTok и Shorts.'
+    ruText: 'Ролики, которые останавливают скролл, — под формат Reels, TikTok and Shorts.'
   },
   {
     num: '03',
@@ -87,15 +87,26 @@ const achievementPhrases = [
   'Уровень ап!'
 ];
 
+const failPhrases = [
+  'УПС!',
+  'БАБАХ!',
+  'БРАК!',
+  'ГЛИТЧ!',
+  'АККУРАТНО!',
+  'НЕ ТОТ КАДР!'
+];
+
 function randomBetween(min, max) {
   return min + Math.random() * (max - min);
 }
 
+// Уникальный идентификатор
 function uid() {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
   return `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+// Прогрессия опыта
 function xpForLevel(level) {
   return Math.floor(42 * Math.pow(level - 1, 1.65));
 }
@@ -108,15 +119,15 @@ function levelFromXp(xp) {
 
 function gameConfig(level) {
   if (level >= 20) {
-    return { count: 6, minSize: 34, maxSize: 78, minDuration: 4.8, maxDuration: 8.5, gradients: true, evasive: true, pulse: true };
+    return { count: 6, minSize: 34, maxSize: 74, minDuration: 4.8, maxDuration: 8.5, gradients: true, evasive: true, pulse: true };
   }
   if (level >= 11) {
-    return { count: 5, minSize: 38, maxSize: 86, minDuration: 6, maxDuration: 10, gradients: true, evasive: false, pulse: false };
+    return { count: 5, minSize: 38, maxSize: 80, minDuration: 6, maxDuration: 10, gradients: true, evasive: false, pulse: false };
   }
   if (level >= 6) {
-    return { count: 5, minSize: 30, maxSize: 72, minDuration: 7, maxDuration: 12, gradients: true, evasive: false, pulse: false };
+    return { count: 5, minSize: 30, maxSize: 68, minDuration: 7, maxDuration: 12, gradients: true, evasive: false, pulse: false };
   }
-  return { count: 4, minSize: 58, maxSize: 96, minDuration: 11, maxDuration: 17, gradients: false, evasive: false, pulse: false };
+  return { count: 4, minSize: 50, maxSize: 85, minDuration: 10, maxDuration: 15, gradients: false, evasive: false, pulse: false };
 }
 
 function blobPath(pointCount = 9) {
@@ -139,24 +150,48 @@ function blobPath(pointCount = 9) {
 
 function createShape(level, sharedColor) {
   const config = gameConfig(level);
-  const colorA = level <= 5 ? sharedColor : siteColors[Math.floor(Math.random() * siteColors.length)];
+  
+  // Прогрессивный выбор доступных цветов для плавного роста разнообразия
+  let allowedColors = [siteColors[0]]; // Всегда доступен фирменный оранжевый (#ff5a2a)
+  if (level >= 2) {
+    allowedColors.push(siteColors[1]); // На 2 уровне добавляем кобальт (#2e4fe0)
+  }
+  if (level >= 3) {
+    allowedColors.push(siteColors[2]); // На 3 уровне добавляем желтый (#f2c230)
+  }
+  // Бумажно-белый цвет (#f3ecdd) для контраста
+  allowedColors.push(siteColors[3]);
+
+  // Выбираем случайный цвет из разблокированного пула
+  const colorA = allowedColors[Math.floor(Math.random() * allowedColors.length)];
   let colorB = siteColors[Math.floor(Math.random() * siteColors.length)];
   if (colorB === colorA) colorB = '#171512';
 
+  // Прогрессивное открытие градиентов
+  let hasGradient = false;
+  if (level >= 4) {
+    // На 4 уровне шанс 25%, на 5 уровне - 40%, на 6+ - согласно дефолтному конфигу
+    const gradientChance = level === 4 ? 0.25 : level === 5 ? 0.40 : 0.65;
+    hasGradient = Math.random() < gradientChance;
+  } else if (config.gradients) {
+    hasGradient = true;
+  }
+
+  // Фигуры спавнятся внутри правого контейнера (проценты по отношению к .game-sandbox)
   return {
     id: uid(),
-    x: randomBetween(10, 82),
-    y: randomBetween(12, 66),
+    x: randomBetween(5, 80),
+    y: randomBetween(5, 75),
     size: randomBetween(config.minSize, config.maxSize),
     colorA,
     colorB,
-    gradient: config.gradients && Math.random() > 0.25,
+    gradient: hasGradient,
     path: blobPath(Math.floor(randomBetween(7, 12))),
     duration: randomBetween(config.minDuration, config.maxDuration),
     delay: randomBetween(-8, 0),
-    floatX: randomBetween(-34, 34),
-    floatY: randomBetween(-28, 28),
-    rotate: randomBetween(-28, 28)
+    floatX: randomBetween(-25, 25),
+    floatY: randomBetween(-20, 20),
+    rotate: randomBetween(-20, 20)
   };
 }
 
@@ -182,16 +217,17 @@ function updateMeta(selector, value) {
   if (el) el.setAttribute('content', value);
 }
 
-export default function HomePage() {
+export default function App() {
   const [lang, setLang] = useState('ru');
   const [modalCase, setModalCase] = useState(null);
   const [xp, setXp] = useState(0);
   const [shapes, setShapes] = useState([]);
+  const [bombs, setBombs] = useState([]);
   const [particles, setParticles] = useState([]);
   const [floatingScores, setFloatingScores] = useState([]);
   const [achievement, setAchievement] = useState(null);
   const [mouse, setMouse] = useState(null);
-  const heroRef = useRef(null);
+  const gameContainerRef = useRef(null);
   const sharedShapeColor = useRef(siteColors[Math.floor(Math.random() * siteColors.length)]);
 
   const t = (en, ru) => (lang === 'ru' ? ru : en);
@@ -238,6 +274,50 @@ export default function HomePage() {
     });
   }, [level]);
 
+  // Логика циклического спавна бомб в зависимости от уровня прогрессии
+  useEffect(() => {
+    if (level < 2) {
+      setBombs([]);
+      return undefined; // На первом уровне бомбы не спавнятся
+    }
+
+    // Лимиты и интервалы, зависящие от уровня
+    const maxActiveBombs = Math.min(1 + Math.floor((level - 2) / 3), 4); // Lvl 2: 1, Lvl 5: 2, Lvl 8: 3, Lvl 11+: 4
+    const spawnCheckRate = Math.max(2500, 7000 - level * 300); // Чем выше уровень, тем чаще проверки (от 6.7с до 2.5с)
+
+    const spawnInterval = setInterval(() => {
+      setBombs((currentBombs) => {
+        if (currentBombs.length >= maxActiveBombs) return currentBombs;
+
+        // Шанс успешного спавна возрастает с уровнем
+        const spawnChance = Math.min(0.3 + level * 0.05, 0.8);
+        if (Math.random() > spawnChance) return currentBombs;
+
+        // Создаем новую бомбу
+        const duration = randomBetween(5, 8); // Время жизни бомбы на экране
+        const newBomb = {
+          id: uid(),
+          x: randomBetween(8, 78),
+          y: randomBetween(8, 70),
+          size: randomBetween(54, 72),
+          floatX: randomBetween(-30, 30),
+          floatY: randomBetween(-30, 30),
+          rotate: randomBetween(-45, 45),
+          duration
+        };
+
+        // JS-таймер удаления синхронизирован с длительностью CSS-анимации
+        setTimeout(() => {
+          setBombs((latest) => latest.filter((b) => b.id !== newBomb.id));
+        }, duration * 1000);
+
+        return [...currentBombs, newBomb];
+      });
+    }, spawnCheckRate);
+
+    return () => clearInterval(spawnInterval);
+  }, [level]);
+
   useEffect(() => {
     const timers = [];
     particles.forEach((particle) => {
@@ -251,12 +331,13 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!achievement) return undefined;
-    const timer = setTimeout(() => setAchievement(null), 2200);
+    const timer = setTimeout(() => setAchievement(null), 1800);
     return () => clearTimeout(timer);
   }, [achievement]);
 
   const handleGameMouseMove = (event) => {
-    const rect = event.currentTarget.getBoundingClientRect();
+    if (!gameContainerRef.current) return;
+    const rect = gameContainerRef.current.getBoundingClientRect();
     setMouse({
       x: ((event.clientX - rect.left) / rect.width) * 100,
       y: ((event.clientY - rect.top) / rect.height) * 100
@@ -265,8 +346,8 @@ export default function HomePage() {
 
   const popShape = (shape, event) => {
     event.stopPropagation();
-    const hero = heroRef.current;
-    const rect = hero?.getBoundingClientRect();
+    const gameContainer = gameContainerRef.current;
+    const rect = gameContainer?.getBoundingClientRect();
     const burstX = rect ? event.clientX - rect.left : 0;
     const burstY = rect ? event.clientY - rect.top : 0;
     const points = shapeXp(level);
@@ -279,20 +360,21 @@ export default function HomePage() {
 
     setParticles((items) => [
       ...items,
-      ...Array.from({ length: 16 }, () => ({
+      ...Array.from({ length: 24 }, () => ({
         id: uid(),
         x: burstX,
         y: burstY,
         color: shape.gradient ? shape.colorB : shape.colorA,
-        dx: randomBetween(-90, 90),
-        dy: randomBetween(-90, 90),
-        size: randomBetween(4, 10)
+        dx: randomBetween(-170, 170),
+        dy: randomBetween(-170, 170),
+        size: randomBetween(10, 20),
+        isBomb: false
       }))
     ]);
 
     setFloatingScores((items) => [
       ...items,
-      { id: uid(), x: burstX, y: burstY, value: points }
+      { id: uid(), x: burstX, y: burstY, value: points, isNegative: false }
     ]);
 
     setXp((currentXp) => {
@@ -300,8 +382,62 @@ export default function HomePage() {
       const nextLevel = levelFromXp(nextXp);
       if (nextLevel > previousLevel || nextXp % 50 < points) {
         const phrase = achievementPhrases[Math.floor(Math.random() * achievementPhrases.length)];
-        setAchievement(nextLevel > previousLevel ? `${phrase} LVL ${nextLevel}` : phrase);
+        setAchievement({
+          text: nextLevel > previousLevel ? `${phrase} LVL ${nextLevel}` : phrase,
+          isFail: false
+        });
       }
+      return nextXp;
+    });
+  };
+
+  // Метод лопания бомбы
+  const popBomb = (bomb, event) => {
+    event.stopPropagation();
+    const gameContainer = gameContainerRef.current;
+    const rect = gameContainer?.getBoundingClientRect();
+    const burstX = rect ? event.clientX - rect.left : 0;
+    const burstY = rect ? event.clientY - rect.top : 0;
+    
+    // Существенный штраф, зависящий от уровня прогрессии
+    const penalty = -(15 + level * 5); 
+    const previousLevel = level;
+
+    // Удаляем бомбу из стейта
+    setBombs((items) => items.filter((item) => item.id !== bomb.id));
+
+    // Спавним грубые "глитчевые" оранжево-черные квадратные частицы
+    setParticles((items) => [
+      ...items,
+      ...Array.from({ length: 28 }, () => ({
+        id: uid(),
+        x: burstX,
+        y: burstY,
+        color: '#ff5a2a', // Ярко-оранжевый сигнальный цвет
+        dx: randomBetween(-200, 200),
+        dy: randomBetween(-200, 200),
+        size: randomBetween(12, 24),
+        isBomb: true
+      }))
+    ]);
+
+    // Добавляем отрицательный счетчик
+    setFloatingScores((items) => [
+      ...items,
+      { id: uid(), x: burstX, y: burstY, value: penalty, isNegative: true }
+    ]);
+
+    // Вычитаем очки, не опускаясь ниже 0
+    setXp((currentXp) => {
+      const nextXp = Math.max(0, currentXp + penalty);
+      const nextLevel = levelFromXp(nextXp);
+      
+      const phrase = failPhrases[Math.floor(Math.random() * failPhrases.length)];
+      setAchievement({
+        text: nextLevel < previousLevel ? `LEVEL DOWN! ⬇` : phrase,
+        isFail: true
+      });
+      
       return nextXp;
     });
   };
@@ -344,105 +480,220 @@ export default function HomePage() {
         </div>
       </header>
 
-      <section className="hero" ref={heroRef}>
+      <section className="hero">
         <video className="hero-video" autoPlay muted loop playsInline preload="auto">
           <source src="/videos/background.mp4" type="video/mp4" />
         </video>
         <div className="hero-overlay" />
-        <div className="hero-game" aria-label={t('XP blob popping mini-game', 'Мини-игра: лопайте XP-фигуры')} onMouseMove={handleGameMouseMove} onMouseLeave={() => setMouse(null)}>
-          {achievement && <div className="achievement-pop" aria-live="polite">{achievement}</div>}
-          {shapes.map((shape) => {
-            const centerX = shape.x;
-            const centerY = shape.y;
-            let dodgeX = 0;
-            let dodgeY = 0;
-            if (currentConfig.evasive && mouse) {
-              const dx = centerX - mouse.x;
-              const dy = centerY - mouse.y;
-              const distance = Math.max(1, Math.hypot(dx, dy));
-              if (distance < 18) {
-                const force = (18 - distance) * 1.8;
-                dodgeX = (dx / distance) * force;
-                dodgeY = (dy / distance) * force;
-              }
-            }
-
-            return (
-              <button
-                className={`game-shape ${currentConfig.pulse ? 'is-pulsing' : ''}`}
-                type="button"
-                key={shape.id}
-                onClick={(event) => popShape(shape, event)}
-                aria-label={t(`Pop shape for ${shapeXp(level)} XP`, `Лопнуть фигуру за ${shapeXp(level)} XP`)}
-                style={{
-                  left: `${shape.x}%`,
-                  top: `${shape.y}%`,
-                  width: `${shape.size}px`,
-                  height: `${shape.size}px`,
-                  '--float-x': `${shape.floatX}px`,
-                  '--float-y': `${shape.floatY}px`,
-                  '--dodge-x': `${dodgeX}px`,
-                  '--dodge-y': `${dodgeY}px`,
-                  '--shape-rotate': `${shape.rotate}deg`,
-                  animationDuration: `${shape.duration}s`,
-                  animationDelay: `${shape.delay}s`
-                }}
-              >
-                <svg viewBox="0 0 100 100" aria-hidden="true">
-                  <defs>
-                    <linearGradient id={`blob-gradient-${shape.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor={shape.colorA} />
-                      <stop offset="100%" stopColor={shape.colorB} />
-                    </linearGradient>
-                  </defs>
-                  <path d={shape.path} fill={shape.gradient ? `url(#blob-gradient-${shape.id})` : shape.colorA} />
-                </svg>
-              </button>
-            );
-          })}
-          {particles.map((particle) => (
-            <span
-              className="burst-particle"
-              key={particle.id}
-              style={{
-                left: `${particle.x}px`,
-                top: `${particle.y}px`,
-                width: `${particle.size}px`,
-                height: `${particle.size}px`,
-                background: particle.color,
-                '--particle-x': `${particle.dx}px`,
-                '--particle-y': `${particle.dy}px`
-              }}
-            />
-          ))}
-          {floatingScores.map((score) => (
-            <span className="floating-xp" key={score.id} style={{ left: `${score.x}px`, top: `${score.y}px` }}>+{score.value} XP</span>
-          ))}
-          <div className="xp-score">
-            <span>{t('Score', 'Счёт')}: {xp} XP</span>
-            <strong>LVL {level}</strong>
-            <div className="xp-progress" aria-hidden="true"><span style={{ width: `${levelProgress}%` }} /></div>
-          </div>
-        </div>
 
         <div className="hero-inner">
-          <span className="eyebrow">{t('MOTION STUDIO — CUT, PASTE, PLAY', 'СТУДИЯ МОУШН-ДИЗАЙНА — РЕЖЬ, КЛЕЙ, ИГРАЙ')}</span>
-          <h1 className="cut-title" style={{ display: lang === 'en' ? 'flex' : 'none' }}>
-            <span className="row"><span className="paper-tile">STOP</span><span className="orange-tile">THE</span></span>
-            <span className="row"><span className="yellow-tile">SCROLL,</span><span className="cobalt-tile">NOT</span></span>
-            <span className="row"><span className="paper-tile">THE</span><span className="orange-tile">SALE.</span></span>
-          </h1>
-          <h1 className="cut-title" style={{ display: lang === 'ru' ? 'flex' : 'none' }}>
-            <span className="row"><span className="paper-tile">СТОП</span><span className="orange-tile">СКРОЛЛУ,</span></span>
-            <span className="row"><span className="yellow-tile">НЕ</span><span className="cobalt-tile">ПРОДАЖАМ.</span></span>
-          </h1>
-          <p className="hero-sub">{t('We take your brand apart — story, product, pitch — and paste it back together as animation people actually stop for. Built for business owners who are done being ignored.', 'Мы разбираем ваш бренд на части — историю, продукт, питч — и склеиваем обратно в анимацию, ради которой люди останавливаются. Для владельцев бизнеса, которым надоело, что их пролистывают.')}</p>
-          <div className="hero-cta">
-            <a href="#contact" className="btn">{t('Start a project', 'Начать проект')}</a>
-            <a href="#work" className="btn ghost">{t('See the work', 'Смотреть работы')}</a>
+          <div className="hero-grid-layout">
+            
+            {/* Левая часть: заголовки и тексты */}
+            <div className="hero-content-side">
+              <span className="eyebrow">{t('MOTION STUDIO — CUT, PASTE, PLAY', 'СТУДИЯ МОУШН-ДИЗАЙНА — РЕЖЬ, КЛЕЙ, ИГРАЙ')}</span>
+              <h1 className="cut-title" style={{ display: lang === 'en' ? 'flex' : 'none' }}>
+                <span className="row"><span className="paper-tile">STOP</span><span className="orange-tile">THE</span></span>
+                <span className="row"><span className="yellow-tile">SCROLL,</span><span className="cobalt-tile">NOT</span></span>
+                <span className="row"><span className="paper-tile">THE</span><span className="orange-tile">SALE.</span></span>
+              </h1>
+              <h1 className="cut-title" style={{ display: lang === 'ru' ? 'flex' : 'none' }}>
+                <span className="row"><span className="paper-tile">СТОП</span><span className="orange-tile">СКРОЛЛУ,</span></span>
+                <span className="row"><span className="yellow-tile">НЕ</span><span className="cobalt-tile">ПРОДАЖАМ.</span></span>
+              </h1>
+              <p className="hero-sub">{t('We take your brand apart — story, product, pitch — and paste it back together as animation people actually stop for. Built for business owners who are done being ignored.', 'Мы разбираем ваш бренд на части — историю, продукт, питч — и склеиваем обратно в анимацию, ради которой люди останавливаются. Для владельцев бизнеса, которым надоело, что их пролистывают.')}</p>
+              <div className="hero-cta">
+                <a href="#contact" className="btn">{t('Start a project', 'Начать проект')}</a>
+                <a href="#work" className="btn ghost">{t('See the work', 'Смотреть работы')}</a>
+              </div>
+              <div className="scroll-cue">
+                <span className="arrow">✂</span> 
+                <span>{t('pop the blobs, avoid the glitch-bombs!', 'лопай фигуры, избегай бомб-глитчей!')}</span>
+              </div>
+            </div>
+
+            {/* Правая часть: Локализованный контейнер игры */}
+            <div className="hero-game-side">
+              <div 
+                className="game-sandbox" 
+                ref={gameContainerRef}
+                onMouseMove={handleGameMouseMove} 
+                onMouseLeave={() => setMouse(null)}
+                aria-label={t('XP blob popping mini-game', 'Мини-игра: лопайте XP-фигуры')}
+              >
+                {achievement && (
+                  <div className={`achievement-pop ${achievement.isFail ? 'is-fail' : ''}`} aria-live="polite">
+                    {achievement.text}
+                  </div>
+                )}
+                
+                {shapes.map((shape) => {
+                  const centerX = shape.x;
+                  const centerY = shape.y;
+                  let dodgeX = 0;
+                  let dodgeY = 0;
+                  if (currentConfig.evasive && mouse) {
+                    const dx = centerX - mouse.x;
+                    const dy = centerY - mouse.y;
+                    const distance = Math.max(1, Math.hypot(dx, dy));
+                    if (distance < 18) {
+                      const force = (18 - distance) * 1.8;
+                      dodgeX = (dx / distance) * force;
+                      dodgeY = (dy / distance) * force;
+                    }
+                  }
+
+                  return (
+                    <button
+                      className={`game-shape ${currentConfig.pulse ? 'is-pulsing' : ''}`}
+                      type="button"
+                      key={shape.id}
+                      onClick={(event) => popShape(shape, event)}
+                      aria-label={t(`Pop shape for ${shapeXp(level)} XP`, `Лопнуть фигуру за ${shapeXp(level)} XP`)}
+                      style={{
+                        left: `${shape.x}%`,
+                        top: `${shape.y}%`,
+                        width: `${shape.size}px`,
+                        height: `${shape.size}px`,
+                        '--float-x': `${shape.floatX}px`,
+                        '--float-y': `${shape.floatY}px`,
+                        '--dodge-x': `${dodgeX}px`,
+                        '--dodge-y': `${dodgeY}px`,
+                        '--shape-rotate': `${shape.rotate}deg`,
+                        animationDuration: `${shape.duration}s`,
+                        animationDelay: `${shape.delay}s`
+                      }}
+                    >
+                      <svg viewBox="0 0 100 100" aria-hidden="true">
+                        <defs>
+                          <linearGradient id={`blob-gradient-${shape.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor={shape.colorA} />
+                            <stop offset="100%" stopColor={shape.colorB} />
+                          </linearGradient>
+                        </defs>
+                        <path d={shape.path} fill={shape.gradient ? `url(#blob-gradient-${shape.id})` : shape.colorA} />
+                      </svg>
+                    </button>
+                  );
+                })}
+
+                {/* Отрендеренные бомбы */}
+                {bombs.map((bomb) => (
+                  <button
+                    className="game-bomb"
+                    type="button"
+                    key={bomb.id}
+                    onClick={(event) => popBomb(bomb, event)}
+                    aria-label={t('Avoid bomb! Click will reduce XP', 'Избегай бомбу! Нажатие отнимет XP')}
+                    style={{
+                      left: `${bomb.x}%`,
+                      top: `${bomb.y}%`,
+                      width: `${bomb.size}px`,
+                      height: `${bomb.size}px`,
+                      '--float-x': `${bomb.floatX}px`,
+                      '--float-y': `${bomb.floatY}px`,
+                      '--shape-rotate': `${bomb.rotate}deg`,
+                      '--bomb-duration': `${bomb.duration}s`
+                    }}
+                  />
+                ))}
+
+                {particles.map((particle) => (
+                  <span
+                    className={`burst-particle ${particle.isBomb ? 'is-bomb-particle' : ''}`}
+                    key={particle.id}
+                    style={{
+                      left: `${particle.x}px`,
+                      top: `${particle.y}px`,
+                      width: `${particle.size}px`,
+                      height: `${particle.size}px`,
+                      background: particle.color,
+                      '--particle-x': `${particle.dx}px`,
+                      '--particle-y': `${particle.dy}px`
+                    }}
+                  />
+                ))}
+
+                {floatingScores.map((score) => (
+                  <span 
+                    className={`floating-xp ${score.isNegative ? 'is-negative' : ''}`} 
+                    key={score.id} 
+                    style={{ left: `${score.x}px`, top: `${score.y}px` }}
+                  >
+                    {score.isNegative ? '' : '+'}{score.value} XP
+                  </span>
+                ))}
+
+                {/* Табло счета аккуратно вписано внутрь контейнера */}
+                <div className="xp-score">
+                  <span>{t('Score', 'Счёт')}: {xp} XP</span>
+                  <strong>LVL {level}</strong>
+                  <div className="xp-progress" aria-hidden="true">
+                    <span style={{ width: `${levelProgress}%` }} />
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
           </div>
-          <div className="scroll-cue"><span className="arrow">✂</span> <span>{t('pop the blobs — collect XP', 'лопай фигуры — собирай XP')}</span></div>
         </div>
+        
+        {/* Инжектируем стили для шипастого комиксного взрыва прямо в компонент */}
+        <style dangerouslySetInnerHTML={{ __html: `
+          .achievement-pop.is-fail {
+            background: #ff2d55 !important; /* Яркий комиксный красный */
+            color: #ffffff !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 1.5rem 2.5rem !important;
+            font-weight: 900 !important;
+            border-radius: 0px !important;
+            font-family: 'Nozhik', sans-serif !important;
+            
+            /* Тень для текста - жирная черная комиксная тень */
+            text-shadow: 
+              2.5px 2.5px 0px #1c1812,
+              -1px -1px 0px #1c1812,
+              1px -1px 0px #1c1812,
+              -1px 1px 0px #1c1812,
+              2.5px -1px 0px #1c1812 !important;
+            
+            /* Эффектная обводка сложными тенями по всему контуру многоугольника + сочная черная комиксная тень снизу-справа */
+            filter: 
+              drop-shadow(3px 0 0 #1c1812) 
+              drop-shadow(-3px 0 0 #1c1812) 
+              drop-shadow(0 3px 0 #1c1812) 
+              drop-shadow(0 -3px 0 #1c1812) 
+              drop-shadow(6px 7px 0 #1c1812) !important;
+            
+            /* 24-конечная взрывная комиксная звезда */
+            clip-path: polygon(
+              100% 50%, 93% 62%, 98% 75%, 85% 78%, 88% 93%, 73% 88%, 65% 100%, 53% 88%,
+              45% 100%, 37% 88%, 22% 95%, 25% 80%, 10% 83%, 15% 68%, 0% 68%, 8% 50%,
+              0% 32%, 15% 32%, 10% 17%, 25% 20%, 22% 5%, 37% 12%, 45% 0%, 53% 12%,
+              65% 0%, 73% 12%, 88% 7%, 85% 22%, 98% 25%, 93% 38%
+            ) !important;
+            
+            transform: translate(-50%, -50%) rotate(-4deg) scale(1.1) !important;
+            animation: comicBurstPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.45) forwards !important;
+          }
+
+          @keyframes comicBurstPop {
+            0% {
+              transform: translate(-50%, -50%) rotate(12deg) scale(0);
+              opacity: 0;
+            }
+            85% {
+              transform: translate(-50%, -50%) rotate(-6deg) scale(1.2);
+              opacity: 1;
+            }
+            100% {
+              transform: translate(-50%, -50%) rotate(-4deg) scale(1.1);
+              opacity: 1;
+            }
+          }
+        ` }} />
       </section>
 
       <section id="services">

@@ -1,0 +1,61 @@
+[33mcommit 7be7bc389aa44db3e984c55a4acd8adc287a2e7f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mcodex-n3f1bw[m[33m)[m
+Author: kishalov <122756429+kishalov@users.noreply.github.com>
+Date:   Tue Jul 7 18:07:19 2026 +0000
+
+    mini-game upgrade
+
+ .next/BUILD_ID                                                                                              |      1 [32m+[m
+ .next/app-path-routes-manifest.json                                                                         |      5 [32m+[m
+ .next/build-manifest.json                                                                                   |     20 [32m+[m
+ .next/cache/config.json                                                                                     |      7 [32m+[m
+ .next/dev/build-manifest.json                                                                               |     50 [32m+[m
+ .next/dev/cache/config.json                                                                                 |      7 [32m+[m
+ .next/dev/cache/next-devtools-config.json                                                                   |      1 [32m+[m
+ .next/dev/cache/turbopack/v16.2.10/00000002.sst                                                             |    Bin [31m0[m -> [32m6501[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000003.sst                                                             |    Bin [31m0[m -> [32m52[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000004.sst                                                             |    Bin [31m0[m -> [32m3141[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000005.meta                                                            |    Bin [31m0[m -> [32m674[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000007.meta                                                            |    Bin [31m0[m -> [32m1189[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000008.meta                                                            |    Bin [31m0[m -> [32m1189[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000011.sst                                                             |    Bin [31m0[m -> [32m2990345[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000014.sst                                                             |    Bin [31m0[m -> [32m52[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000015.sst                                                             |    Bin [31m0[m -> [32m770293[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000016.meta                                                            |    Bin [31m0[m -> [32m150111[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000017.meta                                                            |    Bin [31m0[m -> [32m674[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000019.meta                                                            |    Bin [31m0[m -> [32m150111[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000021.sst                                                             |    Bin [31m0[m -> [32m1497906[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000025.sst                                                             |    Bin [31m0[m -> [32m52[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000026.sst                                                             |    Bin [31m0[m -> [32m119773[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000027.meta                                                            |    Bin [31m0[m -> [32m674[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000028.meta                                                            |    Bin [31m0[m -> [32m37981[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000030.meta                                                            |    Bin [31m0[m -> [32m19293[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000032.sst                                                             |    Bin [31m0[m -> [32m801[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000033.sst                                                             |    Bin [31m0[m -> [32m52[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000034.meta                                                            |    Bin [31m0[m -> [32m674[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000035.meta                                                            |    Bin [31m0[m -> [32m674[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000037.sst                                                             |    Bin [31m0[m -> [32m6106[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000039.sst                                                             |    Bin [31m0[m -> [32m52[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000040.meta                                                            |    Bin [31m0[m -> [32m747[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000041.meta                                                            |    Bin [31m0[m -> [32m674[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000043.sst                                                             |    Bin [31m0[m -> [32m1084871[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000045.sst                                                             |    Bin [31m0[m -> [32m52[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000046.sst                                                             |    Bin [31m0[m -> [32m6789[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000047.meta                                                            |    Bin [31m0[m -> [32m19293[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000048.meta                                                            |    Bin [31m0[m -> [32m674[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000050.meta                                                            |    Bin [31m0[m -> [32m1773[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000053.del                                                             |    Bin [31m0[m -> [32m72[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000054.sst                                                             |    Bin [31m0[m -> [32m60268[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000056.sst                                                             |    Bin [31m0[m -> [32m52[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000057.sst                                                             |    Bin [31m0[m -> [32m129[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000058.meta                                                            |    Bin [31m0[m -> [32m674[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000059.meta                                                            |    Bin [31m0[m -> [32m1189[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000061.meta                                                            |    Bin [31m0[m -> [32m674[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000062.sst                                                             |    Bin [31m0[m -> [32m25938[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000064.sst                                                             |    Bin [31m0[m -> [32m52[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000065.meta                                                            |    Bin [31m0[m -> [32m674[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000066.meta                                                            |    Bin [31m0[m -> [32m895[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000068.sst                                                             |    Bin [31m0[m -> [32m540353[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000070.sst                                                             |    Bin [31m0[m -> [32m52[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000071.sst                                                             |    Bin [31m0[m -> [32m585[m bytes
+ .next/dev/cache/turbopack/v16.2.10/00000072.meta                                                            |    Bin [31m0[m -> [32m674[m bytes
+ .next/dev

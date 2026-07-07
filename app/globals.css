@@ -39,7 +39,7 @@ font-family:'NewCMMono', monospace;
 
   h1,h2,h3{font-family:'Nozhik', sans-serif; font-weight:400; margin:0; text-transform:uppercase; letter-spacing:0.5px;}
   .eyebrow{
-font-family:'NewCMMono', monospace;
+    font-family:'NewCMMono', monospace;
     font-size:0.78rem;
     letter-spacing:0.12em;
     text-transform:uppercase;
@@ -51,9 +51,7 @@ font-family:'NewCMMono', monospace;
     box-shadow:2px 3px 0 rgba(0,0,0,.35);
   }
 
-  /* film grain overlay&nbsp;— built from two offset dot grids, not turbulence.
-     Turbulence noise has an inherent directional bias that showed up as
-     faint diagonal banding across the page; dots have no such bias. */
+  /* film grain overlay — built from two offset dot grids, not turbulence. */
   .grain{
     position:fixed; inset:0; z-index:999; pointer-events:none;
     opacity:0.5; mix-blend-mode:overlay;
@@ -125,7 +123,7 @@ font-family:'NewCMMono', monospace;
     background:var(--paper); border:2px solid var(--ink);
     padding:2px; cursor:pointer; transform:rotate(-2deg);
     box-shadow:3px 3px 0 var(--orange);
-font-family:'NewCMMono', monospace;
+    font-family:'NewCMMono', monospace;
   }
   .lang-option{
     padding:.3rem .55rem; font-size:.75rem; color:var(--ink);
@@ -138,6 +136,7 @@ font-family:'NewCMMono', monospace;
   position: relative;
   overflow: hidden;
   isolation: isolate;
+  padding: 4rem 0;
 }
 .hero::after{
   content:"";
@@ -145,7 +144,7 @@ font-family:'NewCMMono', monospace;
   left:0;
   right:0;
   bottom:0;
-  height:220px; /* регулируй по вкусу */
+  height:220px;
   background:linear-gradient(
     to bottom,
     rgba(23,21,18,0) 0%,
@@ -178,11 +177,45 @@ font-family:'NewCMMono', monospace;
   z-index:-2;
   pointer-events: none;
 }
-  .hero-inner{max-width:1180px; margin:0 auto; position:relative; z-index:90;}
+
+/* Изменено: z-index 90 теперь у контейнера, но pointer-events: none, 
+   чтобы не перехватывать клики насквозь вне игровых и CTA элементов */
+.hero-inner{
+  max-width:1180px; 
+  margin:0 auto; 
+  position:relative; 
+  z-index:90;
+  padding:0 6vw;
+  pointer-events: none;
+}
+
+/* Новое: Двухколоночный Grid для десктопов */
+.hero-grid-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 4rem;
+  align-items: center;
+  min-height: calc(85vh - 80px);
+  width: 100%;
+}
+
+/* Разрешаем клики по левому контенту (CTA, кнопки) */
+.hero-content-side {
+  pointer-events: auto;
+}
+
+/* Разрешаем клики по правому контенту (песочнице) */
+.hero-game-side {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  pointer-events: auto;
+}
+
   .hero .eyebrow{margin-bottom:1.6rem;}
 
   .cut-title{
-    font-size:clamp(2.6rem, 8vw, 6.4rem);
+    font-size:clamp(2.4rem, 5.5vw, 4.8rem);
     line-height:0.98;
     display:flex; flex-wrap:wrap; gap:.5rem .6rem;
   }
@@ -211,7 +244,7 @@ font-family:'NewCMMono', monospace;
   .hero-cta{display:flex; gap:1rem; flex-wrap:wrap;}
 
   .scroll-cue{
-    margin-top:4rem; font-family:'NewCMMono', monospace;; font-size:.8rem;
+    margin-top:3.2rem; font-family:'NewCMMono', monospace; font-size:.8rem;
     color:var(--paper-dim); display:flex; align-items:center; gap:.6rem;
   }
   .scroll-cue .arrow{animation:bob 1.6s infinite ease-in-out;}
@@ -244,7 +277,7 @@ font-family:'NewCMMono', monospace;
   .service-card:hover{transform:rotate(0deg) translateY(-4px); box-shadow:8px 10px 0 rgba(0,0,0,.4); z-index:5;}
   .service-card{transition:transform .25s ease, box-shadow .25s ease;}
   .service-num{
-    font-family:'NewCMMono', monospace;; font-size:.75rem;
+    font-family:'NewCMMono', monospace; font-size:.75rem;
     background:var(--ink); color:var(--paper); padding:.2rem .5rem; display:inline-block; margin-bottom:.8rem;
   }
   .service-card h3{font-size:1.25rem; margin-bottom:.6rem; line-height:1.05;}
@@ -310,7 +343,7 @@ font-family:'NewCMMono', monospace;
   .clip .tag{
     position:absolute; left:10px; bottom:10px;
     background:var(--paper); color:var(--ink);
-    font-family:'NewCMMono', monospace;; font-size:.72rem;
+    font-family:'NewCMMono', monospace; font-size:.72rem;
     padding:.35rem .6rem;
     transform:rotate(-2deg);
     box-shadow:2px 3px 0 rgba(0,0,0,.4);
@@ -362,7 +395,7 @@ font-family:'NewCMMono', monospace;
     padding:1.8rem 1.5rem;
     position:relative;
     box-shadow:5px 6px 0 rgba(0,0,0,.35);
-    font-family:'NewCMMono', monospace;;
+    font-family:'NewCMMono', monospace;
     font-size:.95rem;
     line-height:1.5;
   }
@@ -374,7 +407,7 @@ font-family:'NewCMMono', monospace;
     width:18px; height:18px; border-radius:50%;
     background:var(--orange); border:2px solid var(--ink);
   }
-  .testi .who{margin-top:1.2rem; font-family:'NewCMMono', monospace;; font-size:.85rem; color:#3a342a;}
+  .testi .who{margin-top:1.2rem; font-family:'NewCMMono', monospace; font-size:.85rem; color:#3a342a;}
 
   /* ---------------- CTA STAMP ---------------- */
   .cta-stamp{
@@ -412,10 +445,20 @@ font-family:'NewCMMono', monospace;
     .burger{display:flex;}
     .services-grid, .process-row{grid-template-columns:repeat(2,1fr);}
     .portfolio-grid, .testi-board{grid-template-columns:repeat(2,1fr);}
+    
+    /* Перестроение главного экрана на планшетах */
+    .hero-grid-layout {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      min-height: auto;
+    }
+    .hero-game-side {
+      justify-content: center;
+    }
   }
   @media (max-width:600px){
     .services-grid, .process-row, .portfolio-grid, .testi-board{grid-template-columns:1fr;}
-    .hero{padding:7rem 6vw 5rem;}
+    .hero{padding:5rem 0 3rem;}
     .cta-stamp h2{border-width:3px;}
   }
 
@@ -427,36 +470,75 @@ font-family:'NewCMMono', monospace;
 
   :focus-visible{outline:3px solid var(--yellow); outline-offset:2px;}
 
-/* ---------------- HERO MINI GAME ---------------- */
-.hero-game{
-  position:absolute;
-  inset:0;
-  z-index:60;
-  overflow:hidden;
-  pointer-events:auto;
+/* ---------------- HERO MINI GAME (SANDBOX MODE) ---------------- */
+
+/* Заменили глобальный контейнер .hero-game на песочницу .game-sandbox, 
+   ограниченную размерами правой колонки */
+.game-sandbox {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  height: 480px;
+  background: var(--canvas-light);
+  border: 3px dashed var(--paper-dim);
+  border-radius: 16px;
+  overflow: hidden;
+  z-index: 10;
+  pointer-events: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
-.game-shape{
-  position:absolute;
-  z-index:2;
-  padding:0;
-  border:0;
-  background:transparent;
-  filter:drop-shadow(6px 8px 0 rgba(0,0,0,.35));
-  cursor:pointer;
-  touch-action:manipulation;
-  animation:blobDrift var(--shape-duration, 12s) ease-in-out infinite alternate;
-  transform:translate(var(--dodge-x, 0), var(--dodge-y, 0));
-  transition:filter .2s ease, transform .18s ease;
+
+.game-shape {
+  position: absolute;
+  z-index: 2;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  filter: drop-shadow(4px 6px 0 rgba(0,0,0,.35));
+  cursor: pointer;
+  touch-action: manipulation;
+  animation: blobDrift var(--shape-duration, 12s) ease-in-out infinite alternate;
+  transform: translate(var(--dodge-x, 0), var(--dodge-y, 0));
+  transition: filter .2s ease, transform .18s ease;
 }
-.game-shape:hover{filter:drop-shadow(8px 11px 0 rgba(0,0,0,.45)) saturate(1.08);}
+.game-shape:hover{filter:drop-shadow(6px 8px 0 rgba(0,0,0,.45)) saturate(1.08);}
 .game-shape svg{width:100%; height:100%; overflow:visible;}
-.game-shape path{stroke:var(--ink); stroke-width:3;}
+.game-shape path{stroke:var(--ink); stroke-width:3.5;}
 .game-shape.is-pulsing svg{animation:blobPulse 1.35s ease-in-out infinite;}
+
+/* СТИЛИЗАЦИЯ БОМБЫ: использует фоновое изображение /bomb.png с дефолтным запасным эмодзи в контенте */
+.game-bomb {
+  position: absolute;
+  z-index: 3;
+  padding: 0;
+  border: 0;
+  background: url('/bomb.png') no-repeat center/contain;
+  cursor: pointer;
+  touch-action: manipulation;
+  filter: drop-shadow(4px 6px 0 rgba(0,0,0,.35));
+  pointer-events: auto;
+  /* Анимация жизненного цикла бомбы */
+  animation: bombLifeTime var(--bomb-duration, 6s) ease-in-out forwards;
+}
+.game-bomb::before {
+  content: "💣";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  width: 100%;
+  height: 100%;
+  /* Скрываем эмодзи, если картинка /bomb.png успешно загружена */
+  opacity: 0; 
+}
+.game-bomb:hover {
+  filter: drop-shadow(6px 8px 0 rgba(0,0,0,.45)) saturate(1.2) brightness(1.1);
+}
 
 .achievement-pop{
   position:absolute;
   left:50%;
-  top:23%;
+  top:50%; /* Теперь всплывает по центру песочницы */
   z-index:7;
   transform:translate(-50%, -50%) rotate(-2deg);
   pointer-events:none;
@@ -466,19 +548,28 @@ font-family:'NewCMMono', monospace;
   box-shadow:6px 7px 0 rgba(0,0,0,.45);
   padding:.65rem 1rem;
   font-family:'Nozhik', sans-serif;
-  font-size:clamp(1.3rem, 3vw, 2.4rem);
+  font-size:clamp(1.3rem, 3vw, 2.2rem);
   text-transform:uppercase;
-  animation:achievementFade 2.2s ease forwards;
+  animation:achievementFade 1.8s ease forwards;
+  white-space: nowrap;
 }
 .burst-particle{
   position:absolute;
   z-index:6;
-  border:2px solid var(--ink);
+  border:2.5px solid var(--ink);
   border-radius:999px;
   pointer-events:none;
   transform:translate(-50%, -50%);
-  animation:particleBurst .9s cubic-bezier(.14,.76,.18,1) forwards;
+  animation:particleBurst .9s cubic-bezier(.01,.76,.18,1) forwards;
 }
+
+/* ОРАНЖЕВЫЕ ГЛИТЧЕВЫЕ КВАДРАТНЫЕ ЧАСТИЦЫ ОТ БОМБЫ */
+.burst-particle.is-bomb-particle {
+  border-radius: 0px !important;
+  border-width: 3px !important;
+  background: #ff5a2a !important;
+}
+
 .floating-xp{
   position:absolute;
   z-index:8;
@@ -486,22 +577,30 @@ font-family:'NewCMMono', monospace;
   transform:translate(-50%, -50%);
   color:var(--paper);
   font-family:'Nozhik', sans-serif;
-  font-size:clamp(1.4rem, 4vw, 3.2rem);
+  font-size:clamp(1.4rem, 4vw, 2.6rem);
   text-shadow:3px 3px 0 var(--ink), -2px -2px 0 var(--orange);
   animation:floatingXp .95s ease-out forwards;
 }
-.xp-score{
+
+/* КРАСНЫЙ СЧЕТ ПРИ ПОПАДАНИИ ПО БОМБЕ */
+.floating-xp.is-negative {
+  color: #ff5a2a !important;
+  text-shadow: 3px 3px 0 var(--ink), -2px -2px 0 #2e4fe0 !important;
+}
+
+/* Локализовано внутри .game-sandbox */
+.xp-score {
   position:absolute;
-  right:6vw;
-  bottom:3.2rem;
+  right:1rem;
+  bottom:1rem;
   z-index:9;
-  min-width:190px;
+  min-width:170px;
   pointer-events:none;
   background:rgba(243,236,221,.96);
   color:var(--ink);
   border:3px solid var(--ink);
-  box-shadow:5px 6px 0 rgba(0,0,0,.45);
-  padding:.75rem .85rem;
+  box-shadow:4px 5px 0 rgba(0,0,0,.45);
+  padding:.65rem .75rem;
   font-family:'NewCMMono', monospace;
   transform:rotate(1.5deg);
 }
@@ -514,12 +613,57 @@ font-family:'NewCMMono', monospace;
   0%{transform:translate(var(--dodge-x, 0), var(--dodge-y, 0)) rotate(0deg) scale(1);}
   100%{transform:translate(calc(var(--float-x, 24px) + var(--dodge-x, 0)), calc(var(--float-y, -18px) + var(--dodge-y, 0))) rotate(var(--shape-rotate, 12deg)) scale(1.04);}
 }
+
+/* Анимация полного жизненного цикла бомбы: появление -> дрейф -> мигание (фитиль) -> исчезновение */
+@keyframes bombLifeTime {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  12% {
+    transform: scale(1) rotate(5deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc(var(--float-x) * 0.5), calc(var(--float-y) * 0.5)) rotate(calc(var(--shape-rotate) * 0.5)) scale(1.05);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(var(--float-x), var(--float-y)) rotate(var(--shape-rotate)) scale(1);
+    opacity: 1;
+  }
+  /* Начинается фаза мерцания (с 72% до 95%) */
+  72% { opacity: 0.15; }
+  76% { opacity: 1; }
+  80% { opacity: 0.15; }
+  84% { opacity: 1; }
+  88% { opacity: 0.15; }
+  92% { opacity: 1; }
+  96% { opacity: 0.15; }
+  100% {
+    transform: translate(var(--float-x), var(--float-y)) rotate(var(--shape-rotate)) scale(0);
+    opacity: 0;
+  }
+}
+
 @keyframes blobPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.13);}}
 @keyframes achievementFade{0%{opacity:0; transform:translate(-50%, -35%) scale(.85) rotate(-5deg);}18%,70%{opacity:1; transform:translate(-50%, -50%) scale(1) rotate(-2deg);}100%{opacity:0; transform:translate(-50%, -72%) scale(.96) rotate(2deg);}}
 @keyframes particleBurst{0%{opacity:1; transform:translate(-50%, -50%) scale(1);}100%{opacity:0; transform:translate(calc(-50% + var(--particle-x)), calc(-50% + var(--particle-y))) scale(.25);}}
 @keyframes floatingXp{0%{opacity:0; transform:translate(-50%, -40%) scale(.7) rotate(-4deg);}18%{opacity:1;}100%{opacity:0; transform:translate(-50%, -145%) scale(1.1) rotate(3deg);}}
 
-@media (max-width:600px){
-  .xp-score{right:6vw; bottom:1.5rem; min-width:160px;}
-  .achievement-pop{top:18%;}
+@media (max-width:900px){
+  .game-sandbox {
+    height: 380px;
+    max-width: 100%;
+  }
 }
+
+@media (max-width:600px){
+  .game-sandbox {
+    height: 320px;
+  }
+  .xp-score{right:0.75rem; bottom:0.75rem; min-width:140px;}
+  .achievement-pop{top:50%;}
+}
+
+
