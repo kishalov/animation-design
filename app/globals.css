@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'Nozhik';
-  src: url('fonts/Nozhik.woff') format('woff'); /* проверь расширение файла woff или woff2 */
+  src: url('/fonts/Nozhik.woff') format('woff'); /* проверь расширение файла woff или woff2 */
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -8,7 +8,7 @@
 
 @font-face {
   font-family: 'NewCMMono';
-  src: url('fonts/NewCMMono.woff') format('woff');
+  src: url('/fonts/NewCMMono.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
