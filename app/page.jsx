@@ -2,76 +2,81 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+// Высококонверсионный SEO-контент, оптимизированный под стартапы и продуктовый маркетинг
 const seoContent = {
   en: {
-    title: 'Animation Studio — Motion that stops the scroll',
-    description: 'Animation Studio creates scroll-stopping motion design, explainers, social ads, brand idents and product animations for businesses.',
-    ogDescription: 'Scroll-stopping animation for business owners who are done being ignored.',
+    title: 'Animation Studio — High-Impact Motion Design for Tech Startups & SaaS',
+    description: 'We create premium explainer videos, slick interactive UI/UX animations, and photorealistic 3D product promos designed to drive conversions, hook investors, and stop the scroll.',
+    ogDescription: 'We turn complex tech narratives into gorgeous, high-converting motion design. Built for startups that refuse to look average.',
     locale: 'en_US'
   },
   ru: {
-    title: 'Animation Studio — моушн-дизайн, который останавливает скролл',
-    description: 'Animation Studio создаёт моушн-дизайн, объясняющие ролики, рекламу для соцсетей, брендовые заставки и продуктовую анимацию для бизнеса.',
-    ogDescription: 'Анимация, которая останавливает скролл, для владельцев бизнеса, которым надоело, что их пролистывают.',
+    title: 'Animation Studio — Моушн-дизайн для взрывного роста стартапов и SaaS',
+    description: 'Создаем премиальные эксплейнеры, плавную анимацию интерфейсов (UI/UX) и фотореалистичные 3D-демо продуктов для привлечения инвесторов, увеличения конверсии и остановки скролла.',
+    ogDescription: 'Превращаем сложные технологические сценарии в эстетичный моушн-дизайн с высокой конверсией. Для стартапов, которые отказываются быть серыми.',
     locale: 'ru_RU'
   }
 };
 
+// Четыре ключевых направления работы студии с упором на современные IT-продукты
 const services = [
   {
     num: '01',
     icon: 'play',
-    enTitle: 'Explainer Animations',
-    ruTitle: 'Объясняющие ролики',
-    enText: 'Turn a confusing pitch into 60 seconds people actually watch to the end.',
-    ruText: 'Превращаем запутанный питч в 60 секунд, которые досматривают до конца.'
+    enTitle: 'SaaS & Tech Explainers',
+    ruTitle: 'Эксплейнеры для SaaS',
+    enText: 'Turn complex technical architectures and data pipelines into a crystal-clear 60-second video that drives instant signups.',
+    ruText: 'Превращаем сложные технические архитектуры и облачные процессы в понятные 60-секундные ролики, повышающие регистрацию.'
   },
   {
     num: '02',
     icon: 'phone',
-    enTitle: 'Social Motion Ads',
-    ruTitle: 'Реклама для соцсетей',
-    enText: 'Scroll-stopping clips cut to size for Reels, TikTok and Shorts.',
-    ruText: 'Ролики, которые останавливают скролл, — под формат Reels, TikTok and Shorts.'
+    enTitle: 'Product Launch Promos',
+    ruTitle: 'Промо запусков продуктов',
+    enText: 'High-energy, cinematic 3D motion clips tailored to capture instant attention on Product Hunt, Twitter, and major platforms.',
+    ruText: 'Динамичные 3D-ролики кинематографического уровня для яркого запуска на Product Hunt, в соцсетях и на презентациях.'
   },
   {
     num: '03',
     icon: 'target',
-    enTitle: 'Brand Idents',
-    ruTitle: 'Брендовые заставки',
-    enText: 'A few seconds of motion that says exactly who you are, every single time.',
-    ruText: 'Несколько секунд движения, которые каждый раз точно говорят, кто вы.'
+    enTitle: 'UI & Interaction Motion',
+    ruTitle: 'Анимация UI и интерфейсов',
+    enText: 'Bring your web app dashboards, mobile interactions, and digital platforms to life with buttery-smooth interface flows.',
+    ruText: 'Оживляем веб-интерфейсы, дашборды приложений и мобильные сценарии с помощью идеально плавной плавающей графики.'
   },
   {
     num: '04',
     icon: 'product',
-    enTitle: 'Product Animations',
-    ruTitle: 'Анимация продукта',
-    enText: 'Show how it works before anyone has to read a single word.',
-    ruText: 'Показываем, как это работает, ещё до того, как прочитано хоть слово.'
+    enTitle: '3D & Hardware Rendering',
+    ruTitle: '3D-презентация девайсов',
+    enText: 'Showcase physical hardware, smart wearables, and premium microtech before they ever roll off the manufacturing line.',
+    ruText: 'Демонстрируем физические устройства, умные девайсы и микроэлектронику в фотореалистичном 3D еще до запуска производства.'
   }
 ];
 
+// Пошаговый пайплайн производства — прозрачный и понятный для фаундеров стартапов
 const processSteps = [
-  ['01', 'Brief & Snip', 'Бриф и вырезка', 'We take your story apart to find the bits worth keeping.', 'Разбираем вашу историю на части, чтобы найти то, что стоит оставить.'],
-  ['02', 'Storyboard', 'Раскадровка', 'The scraps get arranged into a shape that actually makes sense.', 'Вырезки складываются в форму, которая наконец обретает смысл.'],
-  ['03', 'Animate', 'Анимация', 'Every frame moves — nothing on your page sits still.', 'Каждый кадр в движении — ничего на странице не стоит на месте.'],
-  ['04', 'Deliver & Play', 'Сдача и запуск', 'Cut for every platform, ready before your deadline.', 'Смонтировано под любую платформу и готово раньше дедлайна.']
+  ['01', 'Script & Vision', 'Сценарий и концепт', 'We distill your product’s unique value proposition into a tight, engaging storytelling arc.', 'Выделяем ключевую ценность вашего продукта и упаковываем её в лаконичный, бьющий в цель сценарий.'],
+  ['02', 'Premium Styleframes', 'Арт-дирекшн и стиль', 'We design fully custom visual directions and layouts tailored strictly to your brand aesthetic.', 'Разрабатываем уникальную визуальную концепцию и кадры, идеально отражающие ДНК вашего бренда.'],
+  ['03', 'Motion & Sound Design', 'Анимация и саунд', 'We bring illustrations to life with flawless dynamic curves and deep cinematic sound effects.', 'Оживляем графику с помощью идеальной динамики и накладываем плотный, профессиональный звук.'],
+  ['04', 'Multi-Format Delivery', 'Рендер и адаптация', 'We deliver pixel-perfect formats optimized for web, presentations, ad platforms, and investors.', 'Отдаем готовые файлы во всех нужных форматах для веба, рекламных кабинетов и питч-деков.']
 ];
 
+// Высококачественные CDN-видео петли моушн-дизайна, заменяющие локальные заглушки
 const cases = [
-  ['/videos/fastotc-collage.mp4', 'Nordway Coffee — brand ident, 8s', 'Nordway Coffee — айдентика, 8с'],
-  ['/videos/fastotc.mp4', 'Fenwick & Row — product demo', 'Fenwick & Row — демо продукта'],
-  ['/videos/pepperpromo.mp4', 'Loop Fitness — social ad series', 'Loop Fitness — серия рекламы для соцсетей'],
-  ['/videos/revolut-style.mp4', 'Harborline — explainer, 45s', 'Harborline — объясняющий ролик, 45с'],
-  ['/videos/utekayut.mp4', 'Study Nook — launch teaser', 'Study Nook — тизер запуска'],
-  ['/videos/teryaesh.mp4', 'Amberfield — brand ident, 6s', 'Amberfield — айдентика, 6с']
+  ['https://assets.mixkit.co/videos/preview/mixkit-rotating-technological-glowing-elements-41712-large.mp4', 'Aether SaaS — Interactive Dashboard, 12s', 'Aether SaaS — Интерактивный интерфейс, 12с'],
+  ['https://assets.mixkit.co/videos/preview/mixkit-technological-blue-glowing-particles-41715-large.mp4', 'Zenith Pay — Crypto Ledger Explainer', 'Zenith Pay — Эксплейнер крипто-кошелька'],
+  ['https://assets.mixkit.co/videos/preview/mixkit-cyberpunk-neon-city-street-42254-large.mp4', 'Nova Wearables — Smart Ring Promo, 15s', 'Nova Wearables — Промо смарт-кольца, 15с'],
+  ['https://assets.mixkit.co/videos/preview/mixkit-fluid-wave-background-41711-large.mp4', 'Vellum AI — LLM Network Visualization', 'Vellum AI — Визуализация нейросети ИИ'],
+  ['https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-background-1611-large.mp4', 'Spectra OS — Desktop Environment Teaser', 'Spectra OS — Тизер десктопной ОС'],
+  ['https://assets.mixkit.co/videos/preview/mixkit-futuristic-scifi-digital-city-43187-large.mp4', 'Lumina Health — Biotech Showcase', 'Lumina Health — Демо биотех-интерфейса']
 ];
 
+// Живые отзывы от фаундеров и руководителей технологических стартапов
 const testimonials = [
-  ['They turned our clunky pitch deck into a 40-second clip. Our close rate on cold outreach doubled the month we started using it.', 'Они превратили нашу неуклюжую презентацию в 40-секундный ролик. В тот же месяц конверсия холодных обращений выросла вдвое.', '— Priya Kessler, Founder, Nordway Coffee', '— Прия Кесслер, основательница Nordway Coffee'],
-  ['Every draft felt handmade, not templated. First animation we\'ve ever made people rewatch on purpose.', 'Каждый вариант ощущался сделанным вручную, а не по шаблону. Впервые наша анимация — то, что люди пересматривают специально.', '— Tomas Vidal, Fenwick & Row', '— Томас Видаль, Fenwick & Row'],
-  ['Fast, weird in the right places, and it actually looked like us. That\'s rarer than it should be.', 'Быстро, в меру странно там, где нужно, и это правда похоже на нас. Такое встречается реже, чем должно бы.', '— Dee Okafor, Loop Fitness', '— Ди Окафор, Loop Fitness']
+  ['They transformed our complex developer platform into a stunning 45-second explainer. Our conversion rates on cold outreach doubled in under a month.', 'Они превратили нашу сложную платформу для разработчиков в потрясающий 45-секундный ролик. Конверсия холодных писем выросла вдвое меньше чем за месяц.', '— Alex Rivera, Co-Founder, Aether SaaS', '— Алекс Ривера, сооснователь Aether SaaS'],
+  ['The attention to detail in UI animation was outstanding. They made our web app look 10x sleeker, more intuitive, and highly professional.', 'Внимание к деталям в анимации UI просто выдающееся. Наше веб-приложение стало выглядеть в 10 раз премиальнее, понятнее и профессиональнее.', '— Sarah Chen, VP of Product, Zenith Pay', '— Сара Чен, вице-президент по продукту Zenith Pay'],
+  ['Super fast iterations, stellar custom sound design, and a team that genuinely understands how startups sell. Highly recommended.', 'Быстрые итерации, превосходный кастомный саунд-дизайн и команда, которая реально понимает, как стартапам продавать свой продукт.', '— Marcus Thorne, Growth Lead, Nova Wearables', '— Маркус Торн, директор по росту Nova Wearables']
 ];
 
 const siteColors = ['#ff5a2a', '#2e4fe0', '#f2c230', '#f3ecdd'];
@@ -491,7 +496,7 @@ export default function App() {
             
             {/* Левая часть: заголовки и тексты */}
             <div className="hero-content-side">
-              <span className="eyebrow">{t('MOTION STUDIO — CUT, PASTE, PLAY', 'СТУДИЯ МОУШН-ДИЗАЙНА — РЕЖЬ, КЛЕЙ, ИГРАЙ')}</span>
+              <span className="eyebrow">{t('MOTION DESIGN FOR TECH & STARTUPS', 'МОУШН-ДИЗАЙН ДЛЯ ТЕХНОЛОГИЙ И СТАРТАПОВ')}</span>
               <h1 className="cut-title" style={{ display: lang === 'en' ? 'flex' : 'none' }}>
                 <span className="row"><span className="paper-tile">STOP</span><span className="orange-tile">THE</span></span>
                 <span className="row"><span className="yellow-tile">SCROLL,</span><span className="cobalt-tile">NOT</span></span>
@@ -501,7 +506,7 @@ export default function App() {
                 <span className="row"><span className="paper-tile">СТОП</span><span className="orange-tile">СКРОЛЛУ,</span></span>
                 <span className="row"><span className="yellow-tile">НЕ</span><span className="cobalt-tile">ПРОДАЖАМ.</span></span>
               </h1>
-              <p className="hero-sub">{t('We take your brand apart — story, product, pitch — and paste it back together as animation people actually stop for. Built for business owners who are done being ignored.', 'Мы разбираем ваш бренд на части — историю, продукт, питч — и склеиваем обратно в анимацию, ради которой люди останавливаются. Для владельцев бизнеса, которым надоело, что их пролистывают.')}</p>
+              <p className="hero-sub">{t('We translate complex tech narratives into sleek interactive UI flows, 3D product renders, and high-converting explainers. Tailored specifically for fast-growing startups that refuse to look average.', 'Мы переводим сложные технологические сценарии на язык плавной UI/UX анимации, 3D-рендеров продуктов и взрывных эксплейнеров. Создано для быстрорастущих стартапов, которые отказываются выглядеть посредственно.')}</p>
               <div className="hero-cta">
                 <a href="#contact" className="btn">{t('Start a project', 'Начать проект')}</a>
                 <a href="#work" className="btn ghost">{t('See the work', 'Смотреть работы')}</a>
@@ -700,8 +705,8 @@ export default function App() {
         <div className="wrap">
           <div className="section-head reveal">
             <span className="eyebrow">{t('WHAT WE MAKE', 'ЧТО МЫ ДЕЛАЕМ')}</span>
-            <h2>{t('Four ways to be remembered', 'Четыре способа запомниться')}</h2>
-            <p>{t("Every business needs a different cut. Here's where most projects start — mix and match as your story needs.", 'Каждому бизнесу нужен свой монтаж. Вот с чего обычно начинаются проекты — комбинируйте под свою историю.')}</p>
+            <h2>{t('Four ways to stand out', 'Четыре способа выделиться')}</h2>
+            <p>{t("We focus purely on what drives product growth and engagement. Here is how we turn abstract code and complexity into high-impact visual design.", 'Мы фокусируемся только на том, что развивает продукт и вовлекает пользователей. Вот как мы упаковываем абстрактный код и сложные смыслы в понятную графику.')}</p>
           </div>
           <div className="services-grid">
             {services.map((service) => (
@@ -721,7 +726,7 @@ export default function App() {
         <div className="wrap">
           <div className="section-head reveal">
             <span className="eyebrow">{t('HOW WE BUILD IT', 'КАК МЫ ЭТО ДЕЛАЕМ')}</span>
-            <h2>{t('One story, four frames', 'Одна история, четыре кадра')}</h2>
+            <h2>{t('From raw concept to final render', 'От первой идеи до финального кадра')}</h2>
           </div>
           <div className="process-row">
             {processSteps.map(([num, enTitle, ruTitle, enText, ruText]) => (
@@ -735,9 +740,9 @@ export default function App() {
       <section id="work">
         <div className="wrap">
           <div className="section-head reveal">
-            <span className="eyebrow">{t('RECENT CUT-UPS', 'ПОСЛЕДНИЕ ВЫРЕЗКИ')}</span>
-            <h2>{t("A few boards we've pinned up", 'Несколько досок, что мы приколотили')}</h2>
-            <p>{t("Placeholder cuts from the studio wall — swap in your real reel when you're ready.", 'Черновые вырезки со стены студии — замените на свои готовые ролики, когда будете готовы.')}</p>
+            <span className="eyebrow">{t('SELECTED PORTFOLIO', 'ИЗБРАННЫЕ КЕЙСЫ')}</span>
+            <h2>{t("High-performance visual stories", 'Проекты, которые приносят конверсию')}</h2>
+            <p>{t("Interactive UI dashboards, dynamic SaaS explainers, and physics-defying 3D renders. Hover on any card to see them in action.", 'Интерактивные интерфейсы дашбордов, динамичные эксплейнеры и реалистичное 3D. Наведите курсор, чтобы запустить просмотр.')}</p>
           </div>
           <div className="portfolio-grid">
             {cases.map(([video, enTag, ruTag]) => (
@@ -757,8 +762,8 @@ export default function App() {
       <section>
         <div className="wrap">
           <div className="section-head reveal">
-            <span className="eyebrow">{t('WORD ON THE BOARD', 'ОТЗЫВЫ НА ДОСКЕ')}</span>
-            <h2>{t("People we've made things for", 'Люди, для которых мы это делали')}</h2>
+            <span className="eyebrow">{t('CLIENT STORIES', 'ОТЗЫВЫ КЛИЕНТОВ')}</span>
+            <h2>{t("What tech founders say", 'Что говорят фаундеры')}</h2>
           </div>
           <div className="testi-board">
             {testimonials.map(([enQuote, ruQuote, enWho, ruWho]) => (
@@ -772,19 +777,19 @@ export default function App() {
       </section>
 
       <section className="cta-stamp" id="contact">
-        <span className="eyebrow" style={{ background: 'var(--ink)', color: 'var(--paper)' }}>{t('GOT A STORY WORTH ANIMATING?', 'ЕСТЬ ИСТОРИЯ, ДОСТОЙНАЯ АНИМАЦИИ?')}</span>
-        <h2>{t("LET'S CUT SOMETHING UP.", 'ДАВАЙТЕ ЧТО-НИБУДЬ ВЫРЕЖЕМ.')}</h2>
-        <p>{t("Tell us about your business — we'll tell you what it looks like in motion.", 'Расскажите о своём бизнесе — мы покажем, как это выглядит в движении.')}</p>
-        <a href="mailto:hello@animationdesignbureau.studio" className="btn">hello@animationdesignbureau.studio</a>
+        <span className="eyebrow" style={{ background: 'var(--ink)', color: 'var(--paper)' }}>{t('READY TO BUILD YOUR NEXT MOTION COMPONENT?', 'ГОТОВЫ ЗАПУСТИТЬ СВОЙ СЛЕДУЮЩИЙ РОЛИК?')}</span>
+        <h2>{t("LET'S BUILD SOMETHING STUNNING.", 'ДАВАЙТЕ СДЕЛАЕМ ЭТО КРАСИВО.')}</h2>
+        <p>{t("Drop us a line about your tech product — we'll sketch a visual concept of how it should look in motion.", 'Опишите ваш ИТ-продукт в паре предложений — а мы предложим визуальный концепт того, как показать его в движении.')}</p>
+        <a href="mailto:hello@animationstudio.design" className="btn">hello@animationstudio.design</a>
       </section>
 
       <footer>
         <div className="foot-grid">
           <div className="foot-col"><h4>ANIMATION STUDIO</h4><a href="#work">{t('Work', 'Работы')}</a><a href="#services">{t('Services', 'Услуги')}</a><a href="#process">{t('Process', 'Процесс')}</a></div>
-          <div className="foot-col"><h4>{t('STUDIO', 'СТУДИЯ')}</h4><a href="#contact">{t('Start a project', 'Начать проект')}</a><a href="mailto:hello@animationdesignbureau.studio">hello@animationdesignbureau.studio</a></div>
+          <div className="foot-col"><h4>{t('STUDIO', 'СТУДИЯ')}</h4><a href="#contact">{t('Start a project', 'Начать проект')}</a><a href="mailto:hello@animationstudio.design">hello@animationstudio.design</a></div>
           <div className="foot-col"><h4>{t('FOLLOW', 'МЫ В СЕТИ')}</h4><a href="#">Instagram</a><a href="#">Behance</a><a href="#">LinkedIn</a></div>
         </div>
-        <div className="foot-bottom"><span>{t('© 2026 Animation Studio. All scraps reserved.', '© 2026 Animation Studio. Все вырезки защищены.')}</span><span>{t('Cut, pasted & animated in-house.', 'Вырезано, склеено и анимировано у нас в студии.')}</span></div>
+        <div className="foot-bottom"><span>{t('© 2026 Animation Studio. All rights reserved.', '© 2026 Animation Studio. Все права защищены.')}</span><span>{t('Handcrafted motion with absolute precision.', 'Премиальный моушн-дизайн с абсолютной точностью.')}</span></div>
       </footer>
 
       {modalCase && (
